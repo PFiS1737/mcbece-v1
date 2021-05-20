@@ -46,22 +46,6 @@ function copy(model) {
     }
 }
 
-// 更改语法提示内容
-function Grammar(str) {
-    if (eval(str.split("[", str.split("[").length - 1).join("[")) !== undefined) {
-        if (eval(str.split("[", str.split("[").length - 1).join("[")).length > 1) {
-            for (var e = 0; e < eval(str.split("[", str.split("[").length - 1).join("[")).length; e++) {
-                str = str.split("[", str.split("[").length - 1).join("[") + `[${e}]`
-                console.log(eval(`${str}.text`))
-                Grammar(str + ".next[0]")
-            }
-        } else if (eval(str) !== "End") {
-            console.log(eval(`${str}.text`))
-            Grammar(str + ".next[0]")
-        }
-    }
-}
-
 // 添加新变量
 function Add(model, str) {
     if (model === "command") {
