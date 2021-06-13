@@ -1,3 +1,3 @@
-# Minecraft Bedrock Edition Command Editor
+# 基岩版指令助手 | Minecraft Bedrock Edition Command Editor
 
-> STILL WRITING 
+> 编写中
