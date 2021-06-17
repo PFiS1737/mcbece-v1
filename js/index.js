@@ -25,7 +25,7 @@ var commandLength
 
 
 // 根据URL参数执行
-window.onload = () => {
+/* window.onload = () => {
     if (window.location.href.split("?").length > 1) {
         var arr = window.location.href.split("?")[1].split("&")
         for (var i = 0; i < arr.length; i++) {
@@ -55,7 +55,7 @@ window.onload = () => {
             }
         }
     }
-}
+} */
 
 // 获取当前指令的名称
 function getCommandName() {
