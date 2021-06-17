@@ -1,0 +1,12 @@
+#listURL {
+    display: none;
+}
+
+.mdui-list-item:hover > #listURL, 
+.mdui-toolbar > #listURL {
+    display: inline !important;
+}
+
+*::-webkit-scrollbar {
+    display: none;
+}
