@@ -151,15 +151,15 @@ function loadList(listName, dataName) {
         listEle.setAttribute("data-list-name", `${listName},${dataName}`)
         if (eval(`json.${dataName}.${LANG}.list.${listName}`) !== undefined) {
             function setWikiURL(i, url) {
-                if (url === "Search") {
+                if (url === "search") {
                     return eval(`json.setting.${LANG}.other.searchURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
-                } else if (url === "Name") {
+                } else if (url === "name") {
                     return eval(`json.setting.${LANG}.other.wikiURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)
-                } else if (url === "Info") {
+                } else if (url === "info") {
                     return eval(`json.setting.${LANG}.other.wikiURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
-                } else if (url === "Command") {
+                } else if (url === "command") {
                     return eval(`json.setting.${LANG}.other.commandURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)
-                } else if (url === "None") {
+                } else if (url === "none") {
                    setTimeout(() => {
                        listEle.querySelectorAll('.mdui-list-item')[i].removeChild(listEle.querySelectorAll('.mdui-list-item')[i].querySelector("#listURL"))
                    }, 10)

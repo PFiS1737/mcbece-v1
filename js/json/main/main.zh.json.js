@@ -4,150 +4,150 @@ json.main.zh = {
             {
                 "name": "false ",
                 "info": "否",
-                "url": "None",
-                "add": "Default"
+                "url": "none",
+                "add": "default"
             },
             {
                 "name": "true ",
                 "info": "是",
-                "url": "None",
-                "add": "Default"
+                "url": "none",
+                "add": "default"
             }
         ],
         "command": [
             {
                 "name": "/alwaysday ",
                 "info": "锁定或解锁日夜循环。",
-                "url": "Command",
-                "add": "Command"
+                "url": "command",
+                "add": "command"
             },
             {
                 "name": "/daylock ",
                 "info": "锁定或解锁日夜循环。",
-                "url": "Command",
-                "add": "Command"
+                "url": "command",
+                "add": "command"
             },
             {
                 "name": "/execute ",
                 "info": "用于执行另一个命令，但是允许改变执行者、命令执行的位置和角度，添加限制执行条件。",
-                "url": "Command",
-                "add": "Command"
+                "url": "command",
+                "add": "command"
             },
             {
                 "name": "/locate ",
                 "info": "在聊天框中为命令执行者显示给定类型结构的最近坐标和距离。",
-                "url": "Command",
-                "add": "Command"
+                "url": "command",
+                "add": "command"
             },
             {
                 "name": "/teleport ",
                 "info": "传送实体（玩家、生物等）。",
-                "url": "Command",
-                "add": "Command"
+                "url": "command",
+                "add": "command"
             }
         ],
         "locate": [
             {
                 "name": "bastionremnant ",
                 "info": "堡垒遗迹",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "buriedtreasure ",
                 "info": "埋藏的宝藏",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "endcity ",
                 "info": "末地城",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "fortress ",
                 "info": "下界要塞",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "mansion ",
                 "info": "林地府邸",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "mineshaft ",
                 "info": "废弃矿井",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "monument ",
                 "info": "海底神殿",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "pillageroutpost ",
                 "info": "掠夺者前哨站",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "ruinedportal ",
                 "info": "废弃传送门",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "ruins ",
                 "info": "海底废墟",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "shipwreck ",
                 "info": "沉船",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "stronghold ",
                 "info": "要塞",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "temple ",
                 "info": "沙漠神殿",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "temple ",
                 "info": "雪屋",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "temple ",
                 "info": "丛林神庙",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "temple ",
                 "info": "女巫小屋",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             },
             {
                 "name": "village ",
                 "info": "村庄",
-                "url": "Info",
-                "add": "Default"
+                "url": "info",
+                "add": "default"
             }
         ]
     },
