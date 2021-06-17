@@ -116,11 +116,11 @@ function copy(request) {
 
 // 添加新变量
 function add(request, str) {
-    if (request === "Command") {
+    if (request === "command") {
         inputEle.value = document.querySelector('.mdui-list-item:hover').querySelector('.mdui-list-item-title').innerHTML        
     } else if (request === "byExhaustive") {
         inputEle.value += str
-    } else if (request === "Default") {
+    } else if (request === "default") {
         inputEle.value = inputEle.value.split(" ", inputEle.value.split(" ").length - 1).join(" ") + " "
         inputEle.value += document.querySelector('.mdui-list-item:hover').querySelector('.mdui-list-item-title').innerHTML
     }
