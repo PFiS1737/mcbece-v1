@@ -1,0 +1,25 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.model.new": {
+			"loop": true,
+			"animation_length": 1,
+			"bones": {
+				"bone": {
+					"rotation": {
+						"0.0": [20, 0, 0],
+						"0.5": [-20, 0, 0],
+						"1.0": [20, 0, 0]
+					}
+				},
+				"bone3": {
+					"rotation": {
+						"0.0": [20, 0, 0],
+						"0.5": [-20.83, 0, 0],
+						"1.0": [20.84, 0, 0]
+					}
+				}
+			}
+		}
+	}
+}
