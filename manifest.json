@@ -1,9 +1,8 @@
 {
    "name": "基岩版命令编写助手",
-   "short_name": "MCBECE",
+   "short_name": "Command Editer",
    "start_url": "./index.html",
    "display": "standalone",
-   "description": "MCBE Command Editer",
    "orientation": "natural",
    "prefer_related_applications": false,
    "background_color": "white",
