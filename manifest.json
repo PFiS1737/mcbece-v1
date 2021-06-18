@@ -1,0 +1,19 @@
+{
+   "name": "基岩版命令编写助手",
+   "short_name": "MCBE CE",
+   "start_url": "/index.html",
+   "display": "Standalone",
+   "description": "MCBE Command Editer",
+   "orientation": "natural",
+   "prefer_related_applications": false,
+   "theme_color": "#3F51B5",
+   "background_color": "white",
+   "icons": [
+      {
+         "src": "image/icon.png",
+         "sizes": "144x144",
+         "type": "image/png"
+      }
+   ],
+   "scope": "/"
+}
