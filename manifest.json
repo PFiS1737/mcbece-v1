@@ -1,12 +1,11 @@
 {
    "name": "基岩版命令编写助手",
-   "short_name": "MCBE CE",
+   "short_name": "MCBECE",
    "start_url": "./index.html",
    "display": "standalone",
    "description": "MCBE Command Editer",
    "orientation": "natural",
    "prefer_related_applications": false,
-   "theme_color": "#3F51B5",
    "background_color": "white",
    "icons": [
       {
