@@ -153,8 +153,6 @@ function loadList(listName, dataName) {
                     </a>
                 </li>`
             }
-        } else if (eval(`json.user.${LANG}.list.${listName}`) !== undefined && dataName === "main") {
-            loadList(listName, "user")
         }
         exhaustive("judge")
         // 更新 #getListName 内容
