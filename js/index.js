@@ -23,40 +23,6 @@ const json = {
 var theLatestParameter
 var commandLength
 
-
-// 根据URL参数执行
-/* window.onload = () => {
-    if (window.location.href.split("?").length > 1) {
-        var arr = window.location.href.split("?")[1].split("&")
-        for (var i = 0; i < arr.length; i++) {
-            if (/setCommand=/g.test(arr[i]) === true) {
-                inputEle.value = arr[i].split("=")[1].split("%20").join(" ")
-                Change()
-                mdui.snackbar({
-                    message: "已根据URL参数自动设置指令",
-                    position: "left-top",
-                    timeout: 2000,
-                    closeOnOutsideClick: false
-                })
-                return
-            }
-        }
-        for (var i = 0; i < arr.length; i++) {
-            if (/loadList=/g.test(arr[i]) === true) {
-                var listName = arr[i].split("=")[1].split("%20")[0]
-                var dataName = arr[i].split("=")[1].split("%20")[1]
-                loadList(listName, dataName)
-                mdui.snackbar({
-                    message: "已根据URL参数自动加载列表",
-                    position: "left-top",
-                    timeout: 2000,
-                    closeOnOutsideClick: false
-                })
-            }
-        }
-    }
-} */
-
 // 获取当前指令的名称
 function getCommandName() {
     var commandName = inputEle.value.split(" ")[0].split("/")[1]
@@ -118,6 +84,8 @@ function copy(request) {
 function add(request, str) {
     if (request === "command") {
         inputEle.value = document.querySelector('.mdui-list-item:hover').querySelector('.mdui-list-item-title').innerHTML        
+    } else if (request === "none") {
+        console.log("这只是个占位项")
     } else if (request === "byExhaustive") {
         inputEle.value += str
     } else if (request === "default") {
@@ -146,8 +114,12 @@ function search() {
 
 // 列表相关
 function loadList(listName, dataName) {
-    if (listEle.getAttribute("data-list-name") !== `${listName},${dataName}`) {
+    if (dataName == null) {
         listEle.innerHTML = ""
+        loadList(listName, "main")
+        loadList(listName, "user")
+    }
+    if (listEle.getAttribute("data-list-name") !== `${listName},${dataName}`) {
         listEle.setAttribute("data-list-name", `${listName},${dataName}`)
         if (eval(`json.${dataName}.${LANG}.list.${listName}`) !== undefined) {
             function setWikiURL(i, url) {
