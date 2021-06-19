@@ -132,6 +132,7 @@ function loadListFromMainJson(listName) {
         }
     }
     if (listEle.getAttribute("data-list-name") !== `${listName}`) {
+        listEle.innerHTML = ""
         listEle.setAttribute("data-list-name", `${listName}`)
         if (eval(`json.main.${LANG}.list.${listName}`) !== undefined) {
             for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
