@@ -40,7 +40,7 @@ function editBegin() {
     listEle.setAttribute("data-finished", "false")
     copy("display")
     if (commandLength === 1) {
-        loadList("command", "main")
+        loadList("command")
         grammarEle.innerHTML = ""
         noteEle.innerHTML = eval(`json.setting.${LANG}.other.beginText`)
     }
@@ -299,7 +299,7 @@ function change() {  // 切换页面数据
     editBegin()
     // /alwaysday
     if (getCommandName() == "alwaysday" && commandLength == 2) {
-        loadList("boolean", "main")
+        loadList("boolean")
         grammarEle.innerHTML = `/alwaysday <strong><布尔值></strong>`
         noteEle.innerHTML = "指定是否开启昼夜更替。"
     } else if (getCommandName() == "alwaysday" && commandLength == 3) {
@@ -307,7 +307,7 @@ function change() {  // 切换页面数据
     }
     // /daylock
     if (getCommandName() == "daylock" && commandLength == 2) {
-        loadList("boolean", "main")
+        loadList("boolean")
         grammarEle.innerHTML = `/daylock <strong><布尔值></strong>`
         noteEle.innerHTML = "指定是否开启昼夜更替。"
     } else if (getCommandName() == "daylock" && commandLength == 3) {
@@ -315,7 +315,7 @@ function change() {  // 切换页面数据
     }
     // /locate
     if (getCommandName() == "locate" && commandLength == 2) {
-        loadList("locate", "main")
+        loadList("locate")
         grammarEle.innerHTML = `/locate <strong><结构类型></strong>`
         noteEle.innerHTML = "指定要定位的结构。"
     } else if (getCommandName() == "locate" && commandLength == 3) {
