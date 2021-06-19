@@ -117,9 +117,9 @@ function loadList(listName, dataName) {
     if (dataName == null) {
         listEle.innerHTML = ""
         loadList(listName, "main")
-        if (eval(`json.${dataName}.${LANG}`) !== undefined) {
-            if (eval(`json.${dataName}.${LANG}.list`) !== undefined) {
-                if (eval(`json.${dataName}.${LANG}.list.${listName}`) !== undefined) {
+        if (eval(`json.user.${LANG}`) !== undefined) {
+            if (eval(`json.user.${LANG}.list`) !== undefined) {
+                if (eval(`json.user.${LANG}.list.${listName}`) !== undefined) {
                     loadList(listName, "user")
                 }
             }
