@@ -117,10 +117,13 @@ function loadList(listName, dataName) {
     if (dataName == null) {
         listEle.innerHTML = ""
         loadList(listName, "main")
-        if (eval(`json.${dataName}.${LANG}.list`)) {
-            if (eval(`json.${dataName}.${LANG}.list.${listName}`) !== undefined) {}
+        if (eval(`json.${dataName}.${LANG}`) !== undefined) {
+            if (eval(`json.${dataName}.${LANG}.list`) !== undefined) {
+                if (eval(`json.${dataName}.${LANG}.list.${listName}`) !== undefined) {
+                    loadList(listName, "user")
+                }
+            }
         }
-        loadList(listName, "user")
     }
     if (listEle.getAttribute("data-list-name") !== `${listName},${dataName}`) {
         listEle.setAttribute("data-list-name", `${listName},${dataName}`)
