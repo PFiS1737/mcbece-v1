@@ -112,8 +112,8 @@ function search() {
     }
 }
 
-// 列表相关
-function loadListFromMainJson(listName) {
+function loadList(listName) {
+    listEle.innerHTML = ""
     function setWikiURL(i, url) {
         if (url === "search") {
             return eval(`json.setting.${LANG}.other.searchURL`) + eval(`json.main.${LANG}.list.${listName}[i].info`)
@@ -131,12 +131,12 @@ function loadListFromMainJson(listName) {
             return eval(`json.main.${LANG}.list.${listName}[i].url`)
         }
     }
-    if (listEle.getAttribute("data-list-name") !== `${listName}`) {
-        listEle.innerHTML = ""
-        listEle.setAttribute("data-list-name", `${listName}`)
-        if (eval(`json.main.${LANG}.list.${listName}`) !== undefined) {
-            for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
-                listEle.innerHTML += `
+    function loadListFromMainJson(listName) {
+        if (listEle.getAttribute("data-list-name") !== `${listName}`) {
+            listEle.setAttribute("data-list-name", `${listName}`)
+            if (eval(`json.main.${LANG}.list.${listName}`) !== undefined) {
+                for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
+                    listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.main.${LANG}.list.${listName}[i].name`)}">
                     <div class="mdui-list-item-content" onclick="add('${eval(`json.main.${LANG}.list.${listName}[i].add`)}'); change();">
                         <div class="mdui-list-item-title" id="name">${eval(`json.main.${LANG}.list.${listName}[i].name`)}</div>
@@ -148,12 +148,39 @@ function loadListFromMainJson(listName) {
                         <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
                     </a>
                 </li>`
+                }
+            }
+            exhaustive("judge")
+            // 更新 #getListName 内容
+            for (var e = 0; e < document.querySelectorAll("#getListName").length; e++) {
+                document.querySelectorAll("#getListName")[e].innerHTML = listName
             }
         }
-        exhaustive("judge")
-        // 更新 #getListName 内容
-        for (var e = 0; e < document.querySelectorAll("#getListName").length; e++) {
-            document.querySelectorAll("#getListName")[e].innerHTML = listName
+    }
+    function loadListFromUserJson(listName) {
+        if (listEle.getAttribute("data-list-name") !== `${listName}`) {
+            listEle.setAttribute("data-list-name", `${listName}`)
+            if (eval(`json.main.${LANG}.list.${listName}`) !== undefined) {
+                for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
+                    listEle.innerHTML += `
+                <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.main.${LANG}.list.${listName}[i].name`)}">
+                    <div class="mdui-list-item-content" onclick="add('${eval(`json.main.${LANG}.list.${listName}[i].add`)}'); change();">
+                        <div class="mdui-list-item-title" id="name">${eval(`json.main.${LANG}.list.${listName}[i].name`)}</div>
+                        <div class="mdui-list-item-text mdui-list-item-one-line">
+                            <span class="mdui-text-color-theme-text" id="info">${eval(`json.main.${LANG}.list.${listName}[i].info`)}</span>
+                        </div>
+                    </div>
+                    <a class="mdui-btn mdui-btn-icon" href="${setWikiURL(i, eval(`json.main.${LANG}.list.${listName}[i].url`))}" target="_blank" id="listURL">
+                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
+                    </a>
+                </li>`
+                }
+            }
+            exhaustive("judge")
+            // 更新 #getListName 内容
+            for (var e = 0; e < document.querySelectorAll("#getListName").length; e++) {
+                document.querySelectorAll("#getListName")[e].innerHTML = listName
+            }
         }
     }
 }
