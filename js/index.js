@@ -114,22 +114,8 @@ function search() {
 
 // 列表相关
 function loadList(listName, dataName) {
-    if (dataName == null) {
-        listEle.innerHTML = ""
-        loadList(listName, "main")
-        if (eval(`json.user.${LANG}`) !== undefined) {
-            if (eval(`json.user.${LANG}.list`) !== undefined) {
-                if (eval(`json.user.${LANG}.list.${listName}`) !== undefined) {
-                    loadList(listName, "user")
-                }
-            }
-        }
-    }
-    if (listEle.getAttribute("data-list-name") !== `${listName},${dataName}`) {
-        listEle.setAttribute("data-list-name", `${listName},${dataName}`)
-        if (eval(`json.${dataName}.${LANG}.list.${listName}`) !== undefined) {
-            function setWikiURL(i, url) {
-                if (url === "search") {
+    function setWikiURL(i, url) {
+        if (url === "search") {
                     return eval(`json.setting.${LANG}.other.searchURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
                 } else if (url === "name") {
                     return eval(`json.setting.${LANG}.other.wikiURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)
@@ -145,8 +131,24 @@ function loadList(listName, dataName) {
                     return eval(`json.${dataName}.${LANG}.list.${listName}[i].url`)
                 }
             }
-            for (var i = 0; i < eval(`json.${dataName}.${LANG}.list.${listName}.length`); i++) {
-                listEle.innerHTML += `
+    if (dataName == null) {
+        listEle.innerHTML = ""
+        loadList(listName, "main")
+        if (eval(`json.user.${LANG}`) !== undefined) {
+            if (eval(`json.user.${LANG}.list`) !== undefined) {
+                if (eval(`json.user.${LANG}.list.${listName}`) !== undefined) {
+                    loadList(listName, "user")
+                }
+            }
+        }
+    }
+    if (listEle.getAttribute("data-list-name") !== `${listName},${dataName}`) {
+        listEle.setAttribute("data-list-name", `${listName},${dataName}`)
+        if (eval(`json.${dataName}.${LANG}`) !== undefined) {
+            if (eval(`json.${dataName}.${LANG}.list`) !== undefined) {
+                if (eval(`json.${dataName}.${LANG}.list.${listName}`) !== undefined) {
+                    for (var i = 0; i < eval(`json.${dataName}.${LANG}.list.${listName}.length`); i++) {
+                        listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)}">
                     <div class="mdui-list-item-content" onclick="add('${eval(`json.${dataName}.${LANG}.list.${listName}[i].add`)}'); change();">
                         <div class="mdui-list-item-title" id="name">${eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)}</div>
@@ -158,6 +160,8 @@ function loadList(listName, dataName) {
                         <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
                     </a>
                 </li>`
+                    }
+                }
             }
         }
         exhaustive("judge")
