@@ -143,7 +143,7 @@ function loadList(listName) {
                             <span class="mdui-text-color-theme-text" id="info">${eval(`json.main.${LANG}.list.${listName}[i].info`)}</span>
                         </div>
                     </div>
-                    <a class="mdui-btn mdui-btn-icon" href="${setWikiURL(i, listName, "maon")}" target="_blank" id="listURL">
+                    <a class="mdui-btn mdui-btn-icon" href="${setWikiURL(i, listName, "main")}" target="_blank" id="listURL">
                         <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
                     </a>
                 </li>`
