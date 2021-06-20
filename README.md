@@ -3,8 +3,6 @@
 ## 制作中...
 ### 目前进度：
 
-> 主函数完全重置中...  
->       ----2021.6.19
 
 
 
@@ -33,8 +31,22 @@
     - json.main.zh.list.gamemode #游戏模式
     - json.main.zh.list.gamerule #游戏规则
     - json.main.zh.list.enchanting #附魔
-    - json.main.zh.list.effect #效果
+    - json.main.zh.list.effect #状态效果
     - json.main.zh.list.entity #实体
+    - json.main.zh.list.event #生成事件
+    - json.main.zh.list.time #时间
+    - json.main.zh.list.sound #声音
+    - json.main.zh.list.fog #迷雾
+    - json.main.zh.list.animation #动作
+    - json.main.zh.list.dimension #维度
+    - json.main.zh.list.ride.model #ride命令的模式
+    - json.main.zh.list.ride.teleport #ride命令中的传送规则
+    - json.main.zh.list.ride.way #ride命令中的骑乘方式
+    - json.main.zh.list.ride.rule #ride命令中的骑乘规则
+    - json.main.zh.list.testforblocksModel #testforblocks命令的模式
+    - json.main.zh.list.whether #天气
+    - json.main.zh.list.
+    - json.main.zh.list.
     - json.main.zh.grammar #指令语法
     - ...
 - 优化：30%
