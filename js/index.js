@@ -113,8 +113,8 @@ function search() {
 }
 
 function loadList(listName) {
-    listEle.innerHTML = ""
     if (listEle.getAttribute("data-list-name") !== `${listName}`) {
+        listEle.innerHTML = ""
         function setWikiURL(i, listName, dataName) {
             var URLSetting = eval(`json.${dataName}.${LANG}.list.${listName}[i].url`)
             if (URLSetting === "search") {
