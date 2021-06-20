@@ -114,26 +114,27 @@ function search() {
 
 function loadList(listName) {
     listEle.innerHTML = ""
-    function setWikiURL(i, url) {
-        if (url === "search") {
-            return eval(`json.setting.${LANG}.other.searchURL`) + eval(`json.main.${LANG}.list.${listName}[i].info`)
-        } else if (url === "name") {
-            return eval(`json.setting.${LANG}.other.wikiURL`) + eval(`json.main.${LANG}.list.${listName}[i].name`)
-        } else if (url === "info") {
-            return eval(`json.setting.${LANG}.other.wikiURL`) + eval(`json.main.${LANG}.list.${listName}[i].info`)
-        } else if (url === "command") {
-            return eval(`json.setting.${LANG}.other.commandURL`) + eval(`json.main.${LANG}.list.${listName}[i].name`)
-        } else if (url === "none") {
-            setTimeout(() => {
-               listEle.querySelectorAll('.mdui-list-item')[i].removeChild(listEle.querySelectorAll('.mdui-list-item')[i].querySelector("#listURL"))
-            }, 10)
-        } else {
-            return eval(`json.main.${LANG}.list.${listName}[i].url`)
+    if (listEle.getAttribute("data-list-name") !== `${listName}`) {
+        listEle.setAttribute("data-list-name", `${listName}`)
+        function setWikiURL(i, listName, dataName) {
+            var URLSetting = eval(`json.${dataName}.${LANG}.list.${listName}[i].url`)
+            if (URLSetting === "search") {
+                return eval(`json.setting.${LANG}.other.searchURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
+            } else if (URLSetting === "name") {
+                return eval(`json.setting.${LANG}.other.wikiURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)
+            } else if (URLSetting === "info") {
+                return eval(`json.setting.${LANG}.other.wikiURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
+            } else if (URLSetting === "command") {
+                return eval(`json.setting.${LANG}.other.commandURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)
+            } else if (URLSetting === "none") {
+                setTimeout(() => {
+                   listEle.querySelectorAll('.mdui-list-item')[i].removeChild(listEle.querySelectorAll('.mdui-list-item')[i].querySelector("#listURL"))
+                }, 10)
+            } else {
+                return URLSetting
+            }
         }
-    }
-    function loadListFromMainJson(listName) {
-        if (listEle.getAttribute("data-list-name") !== `${listName}`) {
-            listEle.setAttribute("data-list-name", `${listName}`)
+        function loadListFromMainJson(listName) {
             if (eval(`json.main.${LANG}.list.${listName}`) !== undefined) {
                 for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
                     listEle.innerHTML += `
@@ -144,43 +145,34 @@ function loadList(listName) {
                             <span class="mdui-text-color-theme-text" id="info">${eval(`json.main.${LANG}.list.${listName}[i].info`)}</span>
                         </div>
                     </div>
-                    <a class="mdui-btn mdui-btn-icon" href="${setWikiURL(i, eval(`json.main.${LANG}.list.${listName}[i].url`))}" target="_blank" id="listURL">
+                    <a class="mdui-btn mdui-btn-icon" href="${setWikiURL(i, listName, "maon")}" target="_blank" id="listURL">
                         <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
                     </a>
                 </li>`
                 }
-            }
-            exhaustive("judge")
-            // 更新 #getListName 内容
-            for (var e = 0; e < document.querySelectorAll("#getListName").length; e++) {
-                document.querySelectorAll("#getListName")[e].innerHTML = listName
             }
         }
-    }
-    function loadListFromUserJson(listName) {
-        if (listEle.getAttribute("data-list-name") !== `${listName}`) {
-            listEle.setAttribute("data-list-name", `${listName}`)
-            if (eval(`json.main.${LANG}.list.${listName}`) !== undefined) {
-                for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
+        function loadListFromUserJson(listName) {
+            if (eval(`json.user.${LANG}.list.${listName}`) !== undefined) {
+                for (var i = 0; i < eval(`json.user.${LANG}.list.${listName}.length`); i++) {
                     listEle.innerHTML += `
-                <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.main.${LANG}.list.${listName}[i].name`)}">
-                    <div class="mdui-list-item-content" onclick="add('${eval(`json.main.${LANG}.list.${listName}[i].add`)}'); change();">
-                        <div class="mdui-list-item-title" id="name">${eval(`json.main.${LANG}.list.${listName}[i].name`)}</div>
+                <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.user.${LANG}.list.${listName}[i].name`)}">
+                    <div class="mdui-list-item-content" onclick="add('${eval(`json.user.${LANG}.list.${listName}[i].add`)}'); change();">
+                        <div class="mdui-list-item-title" id="name">${eval(`json.user.${LANG}.list.${listName}[i].name`)}</div>
                         <div class="mdui-list-item-text mdui-list-item-one-line">
-                            <span class="mdui-text-color-theme-text" id="info">${eval(`json.main.${LANG}.list.${listName}[i].info`)}</span>
+                            <span class="mdui-text-color-theme-text" id="info">${eval(`json.user.${LANG}.list.${listName}[i].info`)}</span>
                         </div>
                     </div>
-                    <a class="mdui-btn mdui-btn-icon" href="${setWikiURL(i, eval(`json.main.${LANG}.list.${listName}[i].url`))}" target="_blank" id="listURL">
+                    <a class="mdui-btn mdui-btn-icon" href="${setWikiURL(i, listName, "user")}" target="_blank" id="listURL">
                         <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
                     </a>
                 </li>`
                 }
             }
-            exhaustive("judge")
-            // 更新 #getListName 内容
-            for (var e = 0; e < document.querySelectorAll("#getListName").length; e++) {
-                document.querySelectorAll("#getListName")[e].innerHTML = listName
-            }
+        }
+        exhaustive("judge")
+        for (var e = 0; e < document.querySelectorAll("#getListName").length; e++) {
+            document.querySelectorAll("#getListName")[e].innerHTML = listName
         }
     }
 }
