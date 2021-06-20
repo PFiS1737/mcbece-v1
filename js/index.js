@@ -40,7 +40,7 @@ function editBegin() {
     listEle.setAttribute("data-finished", "false")
     copy("display")
     if (commandLength === 1) {
-        loadListFromMainJson("command")
+        loadList("command")
         grammarEle.innerHTML = ""
         noteEle.innerHTML = eval(`json.setting.${LANG}.other.beginText`)
     }
@@ -115,7 +115,6 @@ function search() {
 function loadList(listName) {
     listEle.innerHTML = ""
     if (listEle.getAttribute("data-list-name") !== `${listName}`) {
-        listEle.setAttribute("data-list-name", `${listName}`)
         function setWikiURL(i, listName, dataName) {
             var URLSetting = eval(`json.${dataName}.${LANG}.list.${listName}[i].url`)
             if (URLSetting === "search") {
@@ -134,10 +133,9 @@ function loadList(listName) {
                 return URLSetting
             }
         }
-        function loadListFromMainJson(listName) {
-            if (eval(`json.main.${LANG}.list.${listName}`) !== undefined) {
-                for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
-                    listEle.innerHTML += `
+        if (eval(`json.main.${LANG}.list.${listName}`) !== undefined) {
+            for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
+                listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.main.${LANG}.list.${listName}[i].name`)}">
                     <div class="mdui-list-item-content" onclick="add('${eval(`json.main.${LANG}.list.${listName}[i].add`)}'); change();">
                         <div class="mdui-list-item-title" id="name">${eval(`json.main.${LANG}.list.${listName}[i].name`)}</div>
@@ -149,13 +147,14 @@ function loadList(listName) {
                         <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
                     </a>
                 </li>`
-                }
             }
         }
-        function loadListFromUserJson(listName) {
-            if (eval(`json.user.${LANG}.list.${listName}`) !== undefined) {
-                for (var i = 0; i < eval(`json.user.${LANG}.list.${listName}.length`); i++) {
-                    listEle.innerHTML += `
+        listEle.setAttribute("data-list-name", `${listName}`)
+        if (eval(`json.user.${LANG}`) !== undefined) {
+            if (eval(`json.user.${LANG}.list`) !== undefined) {
+                if (eval(`json.user.${LANG}.list.${listName}`) !== undefined) {
+                    for (var i = 0; i < eval(`json.user.${LANG}.list.${listName}.length`); i++) {
+                        listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.user.${LANG}.list.${listName}[i].name`)}">
                     <div class="mdui-list-item-content" onclick="add('${eval(`json.user.${LANG}.list.${listName}[i].add`)}'); change();">
                         <div class="mdui-list-item-title" id="name">${eval(`json.user.${LANG}.list.${listName}[i].name`)}</div>
@@ -167,6 +166,7 @@ function loadList(listName) {
                         <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
                     </a>
                 </li>`
+                    }
                 }
             }
         }
@@ -314,7 +314,7 @@ function change() {  // 切换页面数据
     editBegin()
     // /alwaysday
     if (getCommandName() == "alwaysday" && commandLength == 2) {
-        loadListFromMainJson("boolean")
+        loadList("boolean")
         grammarEle.innerHTML = `/alwaysday <strong><布尔值></strong>`
         noteEle.innerHTML = "指定是否开启昼夜更替。"
     } else if (getCommandName() == "alwaysday" && commandLength == 3) {
@@ -322,7 +322,7 @@ function change() {  // 切换页面数据
     }
     // /daylock
     if (getCommandName() == "daylock" && commandLength == 2) {
-        loadListFromMainJson("boolean")
+        loadList("boolean")
         grammarEle.innerHTML = `/daylock <strong><布尔值></strong>`
         noteEle.innerHTML = "指定是否开启昼夜更替。"
     } else if (getCommandName() == "daylock" && commandLength == 3) {
@@ -330,7 +330,7 @@ function change() {  // 切换页面数据
     }
     // /locate
     if (getCommandName() == "locate" && commandLength == 2) {
-        loadListFromMainJson("locate")
+        loadList("locate")
         grammarEle.innerHTML = `/locate <strong><结构类型></strong>`
         noteEle.innerHTML = "指定要定位的结构。"
     } else if (getCommandName() == "locate" && commandLength == 3) {
