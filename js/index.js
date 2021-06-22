@@ -100,53 +100,60 @@ function search() {
     var e = 0
     for (var i = 0; i < listEle.querySelectorAll('.mdui-list-item').length; i++) {
         listEle.querySelectorAll('.mdui-list-item')[i].style.display = "none"
-        if (listEle.querySelectorAll('#name')[i].innerHTML.startsWith(theLatestParameter) == true || eval("/" + theLatestParameter + "/g.test(listEle.querySelectorAll('#name')[i].innerHTML)") == true) {
+        if (listEle.querySelectorAll('#listName')[i].innerHTML.startsWith(theLatestParameter) == true || eval("/" + theLatestParameter + "/g.test(listEle.querySelectorAll('#listName')[i].innerHTML)") == true) {
             listEle.querySelectorAll('.mdui-list-item')[i].style.display = ""
             e++
         }
         if (e == 0) {
-            if (listEle.querySelectorAll('#info')[i].innerHTML.startsWith(theLatestParameter) == true || eval("/" + theLatestParameter + "/g.test(listEle.querySelectorAll('#info')[i].innerHTML)") == true) {
+            if (listEle.querySelectorAll('#listInfo')[i].innerHTML.startsWith(theLatestParameter) == true || eval("/" + theLatestParameter + "/g.test(listEle.querySelectorAll('#listInfo')[i].innerHTML)") == true) {
                 listEle.querySelectorAll('.mdui-list-item')[i].style.display = ""
             }
         }
     }
 }
 
-function loadList(listName) {
+function loadList(listName, userContentDisplayRule) {
     if (listEle.getAttribute("data-list-name") !== `${listName}`) {
         listEle.innerHTML = ""
-        function setWikiURL(i, listName, dataName) {
-            var URLSetting = eval(`json.${dataName}.${LANG}.list.${listName}[i].url`)
-            if (URLSetting === "search") {
+        function displayListImage(i, listName, dataName) {}
+        function displayListName(i, listName, dataName) {}
+        function displayListInfo(i, listName, dataName) {}
+        function displayListURL(i, listName, dataName) {
+            var displayRule = eval(`json.${dataName}.${LANG}.list.${listName}[i].url`)
+            if (displayRule === "search") {
                 return eval(`json.setting.${LANG}.other.searchURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
-            } else if (URLSetting === "name") {
+            } else if (displayRule === "name") {
                 return eval(`json.setting.${LANG}.other.wikiURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)
-            } else if (URLSetting === "info") {
+            } else if (displayRule === "info") {
                 return eval(`json.setting.${LANG}.other.wikiURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
-            } else if (URLSetting === "command") {
+            } else if (displayRule === "command") {
                 return eval(`json.setting.${LANG}.other.commandURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)
-            } else if (URLSetting === "none") {
+            } else if (displayRule === "none") {
                 setTimeout(() => {
                    listEle.querySelectorAll('.mdui-list-item')[i].removeChild(listEle.querySelectorAll('.mdui-list-item')[i].querySelector("#listURL"))
                 }, 10)
             } else {
-                return URLSetting
+                return displayRule
             }
         }
-        if (eval(`json.main.${LANG}.list.${listName}`) !== undefined) {
-            for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
-                listEle.innerHTML += `
+        if (eval(`json.main.${LANG}`) !== undefined) {
+            if (eval(`json.main.${LANG}.list`) !== undefined) {
+                if (eval(`json.main.${LANG}.list.${listName}`) !== undefined) {
+                    for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
+                        listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.main.${LANG}.list.${listName}[i].name`)}">
                     <div class="mdui-list-item-content" onclick="add('${eval(`json.main.${LANG}.list.${listName}[i].add`)}'); change();">
-                        <div class="mdui-list-item-title" id="name">${eval(`json.main.${LANG}.list.${listName}[i].name`)}</div>
+                        <div class="mdui-list-item-title" id="listName">${eval(`json.main.${LANG}.list.${listName}[i].name`)}</div>
                         <div class="mdui-list-item-text mdui-list-item-one-line">
-                            <span class="mdui-text-color-theme-text" id="info">${eval(`json.main.${LANG}.list.${listName}[i].info`)}</span>
+                            <span class="mdui-text-color-theme-text" id="listInfo">${eval(`json.main.${LANG}.list.${listName}[i].info`)}</span>
                         </div>
                     </div>
-                    <a class="mdui-btn mdui-btn-icon" href="${setWikiURL(i, listName, "main")}" target="_blank" id="listURL">
+                    <a class="mdui-btn mdui-btn-icon" href="${displayListURL(i, listName, "main")}" target="_blank" id="listURL">
                         <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
                     </a>
                 </li>`
+                    }
+                }
             }
         }
         listEle.setAttribute("data-list-name", `${listName}`)
@@ -157,12 +164,12 @@ function loadList(listName) {
                         listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.user.${LANG}.list.${listName}[i].name`)}">
                     <div class="mdui-list-item-content" onclick="add('${eval(`json.user.${LANG}.list.${listName}[i].add`)}'); change();">
-                        <div class="mdui-list-item-title" id="name">${eval(`json.user.${LANG}.list.${listName}[i].name`)}</div>
+                        <div class="mdui-list-item-title" id="listName">${eval(`json.user.${LANG}.list.${listName}[i].name`)}</div>
                         <div class="mdui-list-item-text mdui-list-item-one-line">
-                            <span class="mdui-text-color-theme-text" id="info">${eval(`json.user.${LANG}.list.${listName}[i].info`)}</span>
+                            <span class="mdui-text-color-theme-text" id="listInfo">${eval(`json.user.${LANG}.list.${listName}[i].info`)}</span>
                         </div>
                     </div>
-                    <a class="mdui-btn mdui-btn-icon" href="${setWikiURL(i, listName, "user")}" target="_blank" id="listURL">
+                    <a class="mdui-btn mdui-btn-icon" href="${displayListURL(i, listName, "user")}" target="_blank" id="listURL">
                         <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
                     </a>
                 </li>`
