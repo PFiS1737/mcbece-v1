@@ -50,7 +50,7 @@ function editBegin() {
     commandLength = inputEle.value.split(" ").length
     wikiEle.href = eval(`json.setting.${LANG}.other.commandURL`) + inputEle.value.split(" ")[0]
     listEle.setAttribute("data-finished", "false")
-    copy("display")
+    copyFromInput("display")
     if (commandLength === 1) {
         loadList("command")
         grammarEle.innerHTML = ""
@@ -65,12 +65,12 @@ function editEnd() {
         grammarEle.innerHTML = ""
         noteEle.innerHTML = eval(`json.setting.${LANG}.other.endText`)
         listEle.setAttribute("data-list-name", "none")
-        copy("display")
+        copyFromInput("display")
     }
 }
 
 // 复制输入框内容
-function copy(request) {
+function copyFromInput(request) {
     if (request === "copy") {
         inputEle.select()
         inputEle.setSelectionRange(0, inputEle.value.length)
@@ -127,9 +127,26 @@ function search() {
 function loadList(listName, userContentDisplayRule) {
     if (listEle.getAttribute("data-list-name") !== `${listName}`) {
         listEle.innerHTML = ""
-        function displayListImage(i, listName, dataName) {}
-        function displayListName(i, listName, dataName) {}
-        function displayListInfo(i, listName, dataName) {}
+        function displayListImage(i, listName, dataName) {
+            json.${dataName}.${LANG}.list.${listName}[i].image
+        }
+        function displayListImage(i, listName, dataName) {
+            json.${dataName}.${LANG}.list.${listName}[i].add
+        }
+        function displayListName(i, listName, dataName) {
+            if (eval(`json.${dataName}.${LANG}.list.${listName}[i].name`) !== undefined && eval(`json.${dataName}.${LANG}.list.${listName}[i].name`) !== "") {
+                return eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)
+            } else {
+                console.error(`列表 ${listName} 中第 ${i} 项的 "name" 是必须的。`)
+            }
+        }
+        function displayListInfo(i, listName, dataName) {
+            if (eval(`json.${dataName}.${LANG}.list.${listName}[i].info`) !== undefined) {
+                return eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
+            } else {
+                return ""
+            }
+        }
         function displayListURL(i, listName, dataName) {
             var displayRule = eval(`json.${dataName}.${LANG}.list.${listName}[i].url`)
             if (displayRule === "search") {
@@ -153,11 +170,11 @@ function loadList(listName, userContentDisplayRule) {
                 if (eval(`json.main.${LANG}.list.${listName}`) !== undefined) {
                     for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
                         listEle.innerHTML += `
-                <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.main.${LANG}.list.${listName}[i].name`)}">
-                    <div class="mdui-list-item-content" onclick="addToInput('${eval(`json.main.${LANG}.list.${listName}[i].add`)}'); change();">
-                        <div class="mdui-list-item-title" id="listName">${eval(`json.main.${LANG}.list.${listName}[i].name`)}</div>
+                <li class="mdui-list-item mdui-ripple" id="${i}" name="">
+                    <div class="mdui-list-item-content" onclick="addToInput('${eval(`json.main.${LANG}.list.${listName}[i].add`)}}'); change();">
+                        <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "main")}</div>
                         <div class="mdui-list-item-text mdui-list-item-one-line">
-                            <span class="mdui-text-color-theme-text" id="listInfo">${eval(`json.main.${LANG}.list.${listName}[i].info`)}</span>
+                            <span class="mdui-text-color-theme-text" id="listInfo">${displayListInfo(i, listName, "main")}</span>
                         </div>
                     </div>
                     <a class="mdui-btn mdui-btn-icon" href="${displayListURL(i, listName, "main")}" target="_blank" id="listURL">
@@ -174,11 +191,11 @@ function loadList(listName, userContentDisplayRule) {
                 if (eval(`json.user.${LANG}.list.${listName}`) !== undefined) {
                     for (var i = 0; i < eval(`json.user.${LANG}.list.${listName}.length`); i++) {
                         listEle.innerHTML += `
-                <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.user.${LANG}.list.${listName}[i].name`)}">
+                <li class="mdui-list-item mdui-ripple" id="${i}" name="">
                     <div class="mdui-list-item-content" onclick="addToInput('${eval(`json.user.${LANG}.list.${listName}[i].add`)}'); change();">
-                        <div class="mdui-list-item-title" id="listName">${eval(`json.user.${LANG}.list.${listName}[i].name`)}</div>
+                        <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "user")}</div>
                         <div class="mdui-list-item-text mdui-list-item-one-line">
-                            <span class="mdui-text-color-theme-text" id="listInfo">${eval(`json.user.${LANG}.list.${listName}[i].info`)}</span>
+                            <span class="mdui-text-color-theme-text" id="listInfo">${displayListInfo(i, listName, "user")}</span>
                         </div>
                     </div>
                     <a class="mdui-btn mdui-btn-icon" href="${displayListURL(i, listName, "user")}" target="_blank" id="listURL">
