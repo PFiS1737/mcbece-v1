@@ -129,9 +129,7 @@ function loadList(listName, userContentDisplayRule) {
         listEle.innerHTML = ""
         function displayListImage(i, listName, dataName) {
             if (eval(`json.${dataName}.${LANG}.list.${listName}[i].image`) === undefined || eval(`json.${dataName}.${LANG}.list.${listName}[i].image`) === "" || eval(`json.${dataName}.${LANG}.list.${listName}[i].image`) === "none") {
-                setTimeout(() => {
-                   listEle.querySelectorAll('.mdui-list-item')[i].removeChild(listEle.querySelectorAll('.mdui-list-item')[i].querySelector(".mdui-list-item-avatar"))  //需要自定义优化
-                }, 0)
+                return ""
             } else {
                 return eval(`json.${dataName}mdui-list-item-avatar.${LANG}.list.${listName}[i].image`)
             }
@@ -150,7 +148,7 @@ function loadList(listName, userContentDisplayRule) {
             if (eval(`json.${dataName}.${LANG}.list.${listName}[i].info`) === undefined) {
                 return ""
             } else {
-                return eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
+                return `<div class="mdui-list-item-avatar"><img src="${eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)}"/></div>`
             }
         }
         function displayListURL(i, listName, dataName) {
@@ -177,7 +175,7 @@ function loadList(listName, userContentDisplayRule) {
                     for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
                         listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}" name="">
-                    <div class="mdui-list-item-avatar"><img src="${displayListImage(i, listName, "main")}"/></div>
+                    ${displayListImage(i, listName, "main")}
                     <div class="mdui-list-item-content" onclick="addToInput('${eval(`json.main.${LANG}.list.${listName}[i].add`)}'); change();">
                         <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "main")}</div>
                         <div class="mdui-list-item-text mdui-list-item-one-line">
@@ -199,7 +197,7 @@ function loadList(listName, userContentDisplayRule) {
                     for (var i = 0; i < eval(`json.user.${LANG}.list.${listName}.length`); i++) {
                         listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}" name="">
-                    <div class="mdui-list-item-avatar"><img src="${displayListImage(i, listName, "user")}"/></div>
+                    ${displayListImage(i, listName, "user")}
                     <div class="mdui-list-item-content" onclick="addToInput('${eval(`json.user.${LANG}.list.${listName}[i].add`)}'); change();">
                         <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "user")}</div>
                         <div class="mdui-list-item-text mdui-list-item-one-line">
