@@ -81,7 +81,7 @@ function copy(request) {
 }
 
 // 添加新变量
-function add(request, str) {
+function addToInput(request, str) {
     if (request === "command") {
         inputEle.value = document.querySelector('.mdui-list-item:hover').querySelector('.mdui-list-item-title').innerHTML        
     } else if (request === "none") {
@@ -142,7 +142,7 @@ function loadList(listName, userContentDisplayRule) {
                     for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
                         listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.main.${LANG}.list.${listName}[i].name`)}">
-                    <div class="mdui-list-item-content" onclick="add('${eval(`json.main.${LANG}.list.${listName}[i].add`)}'); change();">
+                    <div class="mdui-list-item-content" onclick="addToInput('${eval(`json.main.${LANG}.list.${listName}[i].add`)}'); change();">
                         <div class="mdui-list-item-title" id="listName">${eval(`json.main.${LANG}.list.${listName}[i].name`)}</div>
                         <div class="mdui-list-item-text mdui-list-item-one-line">
                             <span class="mdui-text-color-theme-text" id="listInfo">${eval(`json.main.${LANG}.list.${listName}[i].info`)}</span>
@@ -163,7 +163,7 @@ function loadList(listName, userContentDisplayRule) {
                     for (var i = 0; i < eval(`json.user.${LANG}.list.${listName}.length`); i++) {
                         listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}" name="${eval(`json.user.${LANG}.list.${listName}[i].name`)}">
-                    <div class="mdui-list-item-content" onclick="add('${eval(`json.user.${LANG}.list.${listName}[i].add`)}'); change();">
+                    <div class="mdui-list-item-content" onclick="addToInput('${eval(`json.user.${LANG}.list.${listName}[i].add`)}'); change();">
                         <div class="mdui-list-item-title" id="listName">${eval(`json.user.${LANG}.list.${listName}[i].name`)}</div>
                         <div class="mdui-list-item-text mdui-list-item-one-line">
                             <span class="mdui-text-color-theme-text" id="listInfo">${eval(`json.user.${LANG}.list.${listName}[i].info`)}</span>
@@ -276,7 +276,7 @@ function exhaustive(request) {
         } else if (request === "preview") {  // 显示预览
             document.querySelector(`${activeTab}`).querySelector("#getExhaustivePreview").value = outputExhaustive()
         } else if (request === "add") {  // 添加
-            add("byExhaustive", outputExhaustive())
+            addToInput("byExhaustive", outputExhaustive())
         }
     }
 }
