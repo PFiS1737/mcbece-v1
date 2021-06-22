@@ -230,11 +230,11 @@ function exhaustive(request) {
             activeTab = document.querySelector("#Exhaustive-tool").querySelector(".mdui-tab-active").href
             listEle.setAttribute("data-is-exhaustive", "true")
             for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
-                listEle.querySelectorAll(".mdui-list-item")[i].innerHTML = `
+                listEle.querySelectorAll(".mdui-list-item")[i].innerHTML += `
                     <label class="mdui-checkbox">
                         <input type="checkbox"/>
                         <i class="mdui-checkbox-icon" style="margin-left: 9px;"></i>
-                    </label>` + listEle.querySelectorAll(".mdui-list-item")[i].innerHTML
+                    </label>`
                 listEle.querySelectorAll("label")[i].addEventListener("click", () => {
                     if (listEle.getAttribute("data-is-exhaustive") === "true") {
                         for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
