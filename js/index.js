@@ -131,7 +131,7 @@ function loadList(listName, userContentDisplayRule) {
             if (eval(`json.${dataName}.${LANG}.list.${listName}[i].image`) === undefined || eval(`json.${dataName}.${LANG}.list.${listName}[i].image`) === "" || eval(`json.${dataName}.${LANG}.list.${listName}[i].image`) === "none") {
                 return ""
             } else {
-                return eval(`json.${dataName}mdui-list-item-avatar.${LANG}.list.${listName}[i].image`)
+                return `<div class="mdui-list-item-avatar"><img src="${eval(`json.${dataName}.${LANG}.list.${listName}[i].image`)}"/></div>`
             }
         }
         function displayListAddRule(i, listName, dataName) {
@@ -148,7 +148,7 @@ function loadList(listName, userContentDisplayRule) {
             if (eval(`json.${dataName}.${LANG}.list.${listName}[i].info`) === undefined) {
                 return ""
             } else {
-                return `<div class="mdui-list-item-avatar"><img src="${eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)}"/></div>`
+                return eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
             }
         }
         function displayListURL(i, listName, dataName) {
