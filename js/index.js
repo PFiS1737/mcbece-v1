@@ -33,6 +33,18 @@ function getCommandName() {
     }
 }
 
+// 获取当前列表名称
+function getListName(model) {
+    var listName = listEle.getAttribute("data-list-name")
+    if (model === "display") {
+        for (var i = 0; i < document.querySelectorAll("#getListName").length; i++) {
+            document.querySelectorAll("#getListName")[i].innerHTML = listName
+        }
+    } else if (model == null) {
+        return listName
+    }
+}
+
 // 开始编写
 function editBegin() {
     commandLength = inputEle.value.split(" ").length
@@ -178,9 +190,7 @@ function loadList(listName, userContentDisplayRule) {
             }
         }
         exhaustive("judge")
-        for (var e = 0; e < document.querySelectorAll("#getListName").length; e++) {
-            document.querySelectorAll("#getListName")[e].innerHTML = listName
-        }
+        getListName("display")
     }
 }
 
