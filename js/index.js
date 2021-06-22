@@ -137,7 +137,7 @@ function loadList(listName, userContentDisplayRule) {
             if (eval(`json.${dataName}.${LANG}.list.${listName}[i].name`) !== undefined && eval(`json.${dataName}.${LANG}.list.${listName}[i].name`) !== "") {
                 return eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)
             } else {
-                console.error(`列表 ${listName} 中第 ${i} 项的 "name" 是必须的。`)
+                console.error(`列表 ${listName} 中，第 ${i} 项的“name”是必须的。`)
             }
         }
         function displayListInfo(i, listName, dataName) {
@@ -233,7 +233,7 @@ function exhaustive(request) {
                 listEle.querySelectorAll(".mdui-list-item")[i].innerHTML += `
                     <label class="mdui-checkbox">
                         <input type="checkbox"/>
-                        <i class="mdui-checkbox-icon" style="margin-left: 9px;"></i>
+                        <i class="mdui-checkbox-icon"></i>
                     </label>`
                 listEle.querySelectorAll("label")[i].addEventListener("click", () => {
                     if (listEle.getAttribute("data-is-exhaustive") === "true") {
