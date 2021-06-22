@@ -171,7 +171,7 @@ function loadList(listName, userContentDisplayRule) {
                     for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
                         listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}" name="">
-                    <div class="mdui-list-item-content" onclick="addToInput('${eval(`json.main.${LANG}.list.${listName}[i].add`)}}'); change();">
+                    <div class="mdui-list-item-content" onclick="addToInput('${eval(`json.main.${LANG}.list.${listName}[i].add`)}'); change();">
                         <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "main")}</div>
                         <div class="mdui-list-item-text mdui-list-item-one-line">
                             <span class="mdui-text-color-theme-text" id="listInfo">${displayListInfo(i, listName, "main")}</span>
