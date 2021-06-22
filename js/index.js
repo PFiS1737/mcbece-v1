@@ -131,7 +131,7 @@ function loadList(listName, userContentDisplayRule) {
             if (eval(`json.${dataName}.${LANG}.list.${listName}[i].image`) === undefined || eval(`json.${dataName}.${LANG}.list.${listName}[i].image`) === "" || eval(`json.${dataName}.${LANG}.list.${listName}[i].image`) === "none") {
                 setTimeout(() => {
                    listEle.querySelectorAll('.mdui-list-item')[i].removeChild(listEle.querySelectorAll('.mdui-list-item')[i].querySelector(".mdui-list-item-avatar"))  //需要自定义优化
-                }, 10)
+                }, 0)
             } else {
                 return eval(`json.${dataName}mdui-list-item-avatar.${LANG}.list.${listName}[i].image`)
             }
