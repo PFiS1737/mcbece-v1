@@ -128,10 +128,10 @@ function loadList(listName, userContentDisplayRule) {
     if (listEle.getAttribute("data-list-name") !== `${listName}`) {
         listEle.innerHTML = ""
         function displayListImage(i, listName, dataName) {
-            json.${dataName}.${LANG}.list.${listName}[i].image
+            eval(`json.${dataName}.${LANG}.list.${listName}[i].image`)
         }
         function displayListImage(i, listName, dataName) {
-            json.${dataName}.${LANG}.list.${listName}[i].add
+            eval(`json.${dataName}.${LANG}.list.${listName}[i].add`)
         }
         function displayListName(i, listName, dataName) {
             if (eval(`json.${dataName}.${LANG}.list.${listName}[i].name`) !== undefined && eval(`json.${dataName}.${LANG}.list.${listName}[i].name`) !== "") {
