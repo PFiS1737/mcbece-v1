@@ -23,6 +23,43 @@ const json = {
 var theLatestParameter
 var commandLength
 
+// 初始化
+window.onload = () => {
+    settings.mduiThemeColor.setMduiThemeColorFromStorage()
+}
+
+// 设置
+const settings = {
+    mduiThemeColor: {
+        origin: {
+            primary: "indigo",
+            accent: "pink"
+        },
+        setMduiThemeColor: function (primary, accent) {
+            var $ = mdui.$
+            $('body').removeClass(`mdui-theme-primary-${this.origin.primary}`)
+            $('body').removeClass(`mdui-theme-accent-${this.origin.accent}`)
+            this.origin = {
+                primary: primary,
+                accent: accent
+            }
+            localStorage.setItem("mduiThemeColor", `{primary: "${primary}", accent: "${accent}"}`)
+            $('body').addClass(`mdui-theme-primary-${primary}`)
+            $('body').addClass(`mdui-theme-accent-${accent}`)
+        },
+        setMduiThemeColorFromStorage: function () {
+            var storage = eval(`(${localStorage.getItem("mduiThemeColor")})`)
+            this.setMduiThemeColor(storage.primary, storage.accent)
+        },
+        getMduiThemeColor: function () {
+            return {
+                primary: this.origin.primary,
+                accent: this.origin.accent
+            }
+        }
+    }
+}
+
 // 获取当前指令的名称
 function getCommandName() {
     var commandName = inputEle.value.split(" ")[0].split("/")[1]
