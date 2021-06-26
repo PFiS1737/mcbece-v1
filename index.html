@@ -188,6 +188,15 @@
             if (localStorage.getItem("language") === null) {
                 localStorage.setItem("language", "zh")
             }
+            /** 
+             * 默认主题色：{primary: "indigo", accent: "pink"}
+             * Default Theme Color: {primary: "indigo", accent: "pink"}
+             * 可用主题色：参见 https://www.mdui.org/docs/color
+             * Available Theme Color: by https://www.mdui.org/docs/color
+             */
+            if (localStorage.getItem("mduiThemeColor") === null) {
+                localStorage.setItem("mduiThemeColor", '{primary: "indigo", accent: "pink"}')
+            }
         </script>
         <script src="./js/index.js"></script>
         <script src="./js/json/main/main.zh.json.js"></script>
