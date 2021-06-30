@@ -415,8 +415,9 @@ function change() {  // 切换页面数据
 window.onload = () => {
     settings.mduiThemeColor.setMduiThemeColorFromStorage()
     if (screen.width < 1024) {
-        document.body.innerHTML += `<!--Eruda.js-->`
-        var script = document.createElement('script')
+        var comment = document.createComment("Eruda.js")
+        document.body.appendChild(comment)
+        var script = document.createElement("script")
         script.src="https://cdn.staticfile.org/eruda/2.4.1/eruda.min.js"
         document.body.appendChild(script)
         script.onload = function () {
