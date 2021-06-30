@@ -14,7 +14,7 @@
 }
 
 .mdui-list-item:hover {
-    background-color: "";
+    background-color: auto;
 }
 
 .mdui-textfield-white .mdui-textfield-input{
