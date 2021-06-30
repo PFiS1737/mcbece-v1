@@ -16,7 +16,6 @@
     - 编写 selector() 函数
     - 编写 setting.setLanguage() 函数
     - 编写 setting.setAppbarPosition() 函数
-    - 编写 setting.setThemeColor() 函数
     - 编写 window.onload 事件，进行初始化
     - ...
 - 主要json：5%
@@ -52,7 +51,6 @@
         - 重构侧边栏的html
         - 根据页面宽度在页面初始化时执行
     - 页面主题色切换
-        - 编写 setting.setThemeColor() 函数
         - 尝试参照 [DFFZMXJ/mdui-colour-pad](https://github.com/DFFZMXJ/mdui-colour-pad) 写一个 html
     - 输入栏及语法提示栏上下位置切换
         - 编写 setting.setAppbarPosition() 函数
