@@ -26,8 +26,6 @@
     - json.main.zh.list.coordinate #坐标
     - json.main.zh.list.block #方块
     - json.main.zh.list.item #物品
-    - json.main.zh.list.locate #结构 (完成)
-    - json.main.zh.list.boolean #布尔值 (完成)
     - json.main.zh.list.gamemode #游戏模式
     - json.main.zh.list.gamerule #游戏规则
     - json.main.zh.list.enchanting #附魔
@@ -50,11 +48,9 @@
     - json.main.zh.grammar #指令语法
     - ...
 - 优化：30%
-    - 移动端Chrome浏览器地址栏变色 (完成)
     - 移动端工具对话框优化
         - 重构侧边栏的html
         - 根据页面宽度在页面初始化时执行
-    - PWA(渐进式网络应用)优化 (完成)
     - 页面主题色切换
         - 编写 setting.setThemeColor() 函数
         - 尝试参照 [DFFZMXJ/mdui-colour-pad](https://github.com/DFFZMXJ/mdui-colour-pad) 写一个 html
@@ -65,6 +61,3 @@
     - 编写 exhaustive() 函数，对应穷举助手功能
     - 桌面端tab键支持
     - ...
-- 自定义系统：10%
-    - 目前仅写了写html，主体功能不能用，而且预计这html以后还要改
-    - 这部分最后再说，先不管它
