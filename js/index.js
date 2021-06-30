@@ -27,9 +27,13 @@ var commandLength
 (function () {
     settings.mduiThemeColor.setMduiThemeColorFromStorage()
     if (screen.width < 1024) {
-        document.body.innerHTML += `<!--Eruda.js-->
-        <script src="https://cdn.staticfile.org/eruda/2.4.1/eruda.min.js"></script>
-        <script>eruda.init();</script>`
+        document.body.innerHTML += `<!--Eruda.js-->`
+        var script = document.createElement('script')
+        script.src="https://cdn.staticfile.org/eruda/2.4.1/eruda.min.js"
+        document.body.appendChild(script)
+        script.onload = function () {
+            eruda.init()
+        }
     }
 })()
 
