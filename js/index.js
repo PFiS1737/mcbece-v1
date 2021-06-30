@@ -26,6 +26,16 @@ var commandLength
 // 初始化
 window.onload = () => {
     settings.mduiThemeColor.setMduiThemeColorFromStorage()
+    if (screen.width < 1024) {
+        document.body.innerHTML += `<!--Eruda.js-->
+        <script src="https://cdn.staticfile.org/eruda/2.4.1/eruda.min.js"></script>
+        <script>eruda.init();</script>`
+    }
+    
+        
+    <!--Eruda.js-->
+        <script src="https://cdn.staticfile.org/eruda/2.4.1/eruda.min.js"></script>
+        <script>eruda.init();</script>
 }
 
 // 设置
