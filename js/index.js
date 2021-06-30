@@ -412,7 +412,7 @@ function change() {  // 切换页面数据
 }
 
 // 初始化
-(function () {
+window.onload = () => {
     settings.mduiThemeColor.setMduiThemeColorFromStorage()
     if (screen.width < 1024) {
         document.body.innerHTML += `<!--Eruda.js-->`
@@ -423,4 +423,4 @@ function change() {  // 切换页面数据
             eruda.init()
         }
     }
-})()
+}
