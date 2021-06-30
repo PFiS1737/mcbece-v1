@@ -31,11 +31,6 @@ window.onload = () => {
         <script src="https://cdn.staticfile.org/eruda/2.4.1/eruda.min.js"></script>
         <script>eruda.init();</script>`
     }
-    
-        
-    <!--Eruda.js-->
-        <script src="https://cdn.staticfile.org/eruda/2.4.1/eruda.min.js"></script>
-        <script>eruda.init();</script>
 }
 
 // 设置
