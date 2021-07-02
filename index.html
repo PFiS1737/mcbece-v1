@@ -92,7 +92,7 @@
                             每行只能输入<strong>一个</strong>链接<br />
                             请确保每条 JavaScript 链接都以 ".js" 结尾<br />
                             网站会自动识别以 "/user.json" 结尾的链接，并使用其中的内容<br />
-                            你可以点击<a target="_blank" href="./js/json/user/demo.json">这里</a>查看 "user.json" 的示例文件<br />
+                            你可以点击<a target="_blank" href="./js/custom/demo/user.json">这里</a>查看 "user.json" 的示例文件<br />
                             请勿多次保存，如确需修改，请先<strong>刷新页面</strong><br />
                             我不会获得您的链接，所有信息都将保存在 localStorage 中
                         </span>
@@ -225,11 +225,11 @@
                 localStorage.setItem("mduiThemeColor", '{primary: "indigo", accent: "pink"}')
             }
             /** 
-             * 默认自定义链接：./js/custom/demo.json
-             * Default custom URL: ./js/custom/demo.json
+             * 默认自定义链接：./js/custom/demo/user.json
+             * Default custom URL: ./js/custom/demo/user.json
              */
             if (localStorage.getItem("customURL") === null) {
-                localStorage.setItem("customURL", "./js/custom/demo.json")
+                localStorage.setItem("customURL", "./js/custom/demo/user.json")
             }
         </script>
         <script src="./js/index.js"></script>
