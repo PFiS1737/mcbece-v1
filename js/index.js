@@ -348,7 +348,7 @@ function exhaustive(request) {
 
 // 自定义
 const custom = {
-    setCustomURL: function () {
+    setCustomURL: function (isWithoutReload) {
         var allURL = document.querySelector("#customURL").value.split("\n")
         if (allURL.length >= 1) {
             var comment = document.createComment("Custom JavaScript")
@@ -375,10 +375,12 @@ const custom = {
         }
         localStorage.setItem("customURL", `${realURL}`)
         document.querySelector("#customURL").value = localStorage.getItem("customURL").split(",").join("\n")
+        if (isWithoutReload === true) return
+        location.reload()
     },
     setCustomURLFromStorage: function () {
         document.querySelector("#customURL").value = localStorage.getItem("customURL").split(",").join("\n")
-        this.setCustomURL()
+        this.setCustomURL(true)
     },
     getCustomURL: function () {
         return localStorage.getItem("extendURL").split(",")
