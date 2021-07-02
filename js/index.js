@@ -349,7 +349,7 @@ function exhaustive(request) {
 // 自定义
 const custom = {
     setCustomURL: function () {
-        var allURL = document.querySelector("#extendURL").value.split("\n")
+        var allURL = document.querySelector("#customURL").value.split("\n")
         if (allURL.length >= 1) {
             var comment = document.createComment("Custom JavaScript")
             document.body.appendChild(comment)
