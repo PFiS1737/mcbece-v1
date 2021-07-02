@@ -209,8 +209,6 @@
             /**
              * 默认语言：简体中文
              * Default language: Simplified Chinese
-             * 可用语言：简体中文 ("zh")，英文 ("en")
-             * Available languages: Simplified Chinese ("zh"), English ("en")
              */
             if (localStorage.getItem("language") === null) {
                 localStorage.setItem("language", "zh")
@@ -225,11 +223,11 @@
                 localStorage.setItem("mduiThemeColor", '{primary: "indigo", accent: "pink"}')
             }
             /** 
-             * 默认自定义链接：./js/custom/demo/user.json
-             * Default custom URL: ./js/custom/demo/user.json
+             * 默认自定义链接：""(空)
+             * Default custom URL: ""(none)
              */
             if (localStorage.getItem("customURL") === null) {
-                localStorage.setItem("customURL", "./js/custom/demo/user.json")
+                localStorage.setItem("customURL", "")
             }
         </script>
         <script src="./js/index.js"></script>
