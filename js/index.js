@@ -346,15 +346,44 @@ function exhaustive(request) {
     }
 }
 
-// 扩展工具
-function extend(request) {
-    if (request === "grammar") {
-        
-    } else if (request === "list") {
-        
+// 自定义
+const custom = {
+    setCustomURL: function () {
+        var allURL = document.querySelector("#extendURL").value.split("\n")
+        if (allURL.length >= 1) {
+            var comment = document.createComment("Custom JavaScript")
+            document.body.appendChild(comment)
+            var realURL = new Array
+            for (var i = 0; i < allURL.length; i++) {
+                if (allURL[i] !== "" && allURL[i].endsWith(".js")) {
+                    var script = document.createElement("script")
+                    script.src = allURL[i]
+                    document.body.appendChild(script)
+                    realURL.push(allURL[i])
+                } else if (allURL[i] !== "" && allURL[i].endsWith("/user.json")) {
+                    var request = new XMLHttpRequest()
+                    request.open("get", allURL[i])
+                    request.send(null)
+                    request.onload = function () {
+                        if (request.status == 200) {
+                            json.user = JSON.parse(request.responseText)
+                        }
+                    }
+                    realURL.push(allURL[i])
+                }
+            }
+        }
+        localStorage.setItem("customURL", `${realURL}`)
+        document.querySelector("#customURL").value = localStorage.getItem("customURL").split(",").join("\n")
+    },
+    setCustomURLFromStorage: function () {
+        document.querySelector("#customURL").value = localStorage.getItem("customURL").split(",").join("\n")
+        this.setCustomURL()
+    },
+    getCustomURL: function () {
+        return localStorage.getItem("extendURL").split(",")
     }
 }
-
 
 
 
@@ -414,6 +443,7 @@ function change() {  // 切换页面数据
 // 初始化
 window.onload = () => {
     settings.mduiThemeColor.setMduiThemeColorFromStorage()
+    custom.setCustomURLFromStorage()
     if (screen.width < 1024) {
         var comment = document.createComment("Eruda.js")
         document.body.appendChild(comment)
