@@ -418,7 +418,7 @@ window.onload = () => {
         var comment = document.createComment("Eruda.js")
         document.body.appendChild(comment)
         var script = document.createElement("script")
-        script.src="https://cdn.staticfile.org/eruda/2.4.1/eruda.min.js"
+        script.src = "https://cdn.staticfile.org/eruda/2.4.1/eruda.min.js"
         document.body.appendChild(script)
         script.onload = function () {
             eruda.init()
