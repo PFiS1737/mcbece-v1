@@ -53,8 +53,8 @@
             <div id="drawer-tab1-tool" class="mdui-p-a-2">
                 <div class="mdui-card mdui-shadow-6 mdui-m-b-2" id="Extend-card" style="border-radius: 6px;">
                     <div class="mdui-card-primary mdui-p-t-2">
-                        <div class="mdui-card-primary-title">扩展工具</div>
-                        <div class="mdui-card-primary-subtitle">您可以通过这个工具对本站内容进行扩展</div>
+                        <div class="mdui-card-primary-title">自定义</div>
+                        <div class="mdui-card-primary-subtitle">您可以通过这个工具对本站内容进行自定义</div>
                     </div>
                     <div class="mdui-card-actions">
                         <button class="mdui-btn mdui-text-color-theme-accent mdui-ripple mdui-float-right mdui-m-r-0" mdui-dialog="{target: '#Extend-tool', history: false, modal: true}">打开</button>
@@ -75,14 +75,41 @@
             </div>
         </div>
         <!--工具-->
-        <div class="mdui-dialog" id="Extend-tool">
+        <div class="mdui-dialog" id="Custom-tool">
             <div class="mdui-dialog-title mdui-color-theme">
-                <span class="mdui-typo-headline">扩展工具</span>
-                <div class="mdui-typo-caption-opacity">你可以通过这个工具集对本站内容进行扩展</div>
+                <span class="mdui-typo-headline">自定义</span>
+                <div class="mdui-typo-caption-opacity">你可以通过这个工具对本站内容进行自定义</div>
             </div>
-            <div class="mdui-dialog-content mdui-p-t-3" style="padding-bottom: 48px;">
+            <div class="mdui-divider-dark" style="height: 2px;"></div>
+            <div class="mdui-dialog-content">
+                <div class="mdui-row">
+                    <div class="mdui-col-xs-12 mdui-p-b-1">
+                        <div class="mdui-typo-title">说明：</div>
+                    </div>
+                    <div class="mdui-col-xs-1 mdui-p-b-1" style="width: 30px;"></div>
+                    <div class="mdui-col-xs-11 mdui-p-b-1">
+                        <span class="mdui-typo">
+                            每行只能输入<strong>一个</strong>链接<br />
+                            请确保每条 JavaScript 链接都以 ".js" 结尾<br />
+                            网站会自动识别以 "/user.json" 结尾的链接，并使用其中的内容<br />
+                            你可以点击<a target="_blank" href="./js/json/user/demo.json">这里</a>查看 "user.json" 的示例文件<br />
+                            请勿多次保存，如确需修改，请先<strong>刷新页面</strong><br />
+                            我不会获得您的链接，所有信息都将保存在 localStorage 中
+                        </span>
+                    </div>
+                    <div class="mdui-col-xs-12 mdui-p-b-1">
+                        <div class="mdui-typo-title">输入：</div>
+                    </div>
+                    <div class="mdui-col-xs-1 mdui-p-b-1" style="width: 30px;"></div>
+                    <div class="mdui-col-xs-11 mdui-p-b-1">
+                        <div class="mdui-textfield mdui-textfield-black mdui-p-a-0">
+                            <textarea class="mdui-textfield-input" placeholder="请输入文件链接（每行一个）" id="customURL"></textarea>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="mdui-dialog-actions">
+                <button class="mdui-btn mdui-ripple" onclick="custom.setCustomURL()">保存</button>
                 <button class="mdui-btn mdui-ripple" mdui-dialog-close>关闭</button>
             </div>
         </div>
@@ -196,6 +223,13 @@
              */
             if (localStorage.getItem("mduiThemeColor") === null) {
                 localStorage.setItem("mduiThemeColor", '{primary: "indigo", accent: "pink"}')
+            }
+            /** 
+             * 默认自定义链接：./js/custom/demo.json
+             * Default custom URL: ./js/custom/demo.json
+             */
+            if (localStorage.getItem("customURL") === null) {
+                localStorage.setItem("customURL", "./js/custom/demo.json")
             }
         </script>
         <script src="./js/index.js"></script>
