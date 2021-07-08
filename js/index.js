@@ -23,134 +23,170 @@ const json = {
 var theLatestParameter
 var commandLength
 
-// 设置
-const settings = {
-    mduiThemeColor: {
-        origin: {
-            primary: "indigo",
-            accent: "pink"
-        },
-        setMduiThemeColor: function (primary, accent) {
-            var $ = mdui.$
-            $('body').removeClass(`mdui-theme-primary-${this.origin.primary}`)
-            $('body').removeClass(`mdui-theme-accent-${this.origin.accent}`)
-            this.origin = {
-                primary: primary,
-                accent: accent
+const page = {
+    change: function () {},
+    input: {
+        add: function (request, str) {
+            if (request === "command") {
+                inputEle.value = document.querySelector('.mdui-list-item:hover').querySelector('.mdui-list-item-title').innerHTML        
+            } else if (request === "none") {
+                console.log("这只是个占位项")
+            } else if (request === "byExhaustive") {
+                inputEle.value += str
+            } else if (request === "default") {
+                inputEle.value = inputEle.value.split(" ", inputEle.value.split(" ").length - 1).join(" ") + " "
+                inputEle.value += document.querySelector('.mdui-list-item:hover').querySelector('.mdui-list-item-title').innerHTML
             }
-            localStorage.setItem("mduiThemeColor", `{primary: "${primary}", accent: "${accent}"}`)
-            $('body').addClass(`mdui-theme-primary-${primary}`)
-            $('body').addClass(`mdui-theme-accent-${accent}`)
         },
-        setMduiThemeColorFromStorage: function () {
-            var storage = eval(`(${localStorage.getItem("mduiThemeColor")})`)
-            this.setMduiThemeColor(storage.primary, storage.accent)
+        copy: function (request) {
+            if (request === "copy") {
+                inputEle.select()
+                inputEle.setSelectionRange(0, inputEle.value.length)
+                document.execCommand('copy')
+                mdui.snackbar({
+                    message: "已复制",
+                    position: "left-top",
+                    timeout: 2000,
+                    closeOnOutsideClick: false
+                })
+            } else if (request === "display") {
+                if (listEle.getAttribute("data-finished") == "true") {
+                    wikiEle.style.display = "none"
+                    copyEle.style.display = ""
+                } else {
+                    wikiEle.style.display = ""
+                    copyEle.style.display = "none"
+                }
+            }
         },
-        getMduiThemeColor: function () {
-            return {
-                primary: this.origin.primary,
-                accent: this.origin.accent
+        getCommandName: function () {
+            var commandName = inputEle.value.split(" ")[0]
+            if (commandName === "") {
+                return "undefined"
+            } else {
+                return inputEle.value.split(" ")[0].split("/")[1]
+            }
+        },
+        getParameterByLength: function () {}
+    },
+    edit: {
+        begin: function () {
+            var commandLength = inputEle.value.split(" ").length
+            wikiEle.href = eval(`json.setting.${LANG}.other.commandURL`) + inputEle.value.split(" ")[0]
+            listEle.setAttribute("data-finished", "false")
+            page.input.copy("display")
+            if (commandLength === 1) {
+                page.list.load("command")
+                grammarEle.innerHTML = ""
+                noteEle.innerHTML = eval(`json.setting.${LANG}.other.beginText`)
+            }
+        },
+        finish: function () {
+            if (listEle.getAttribute("data-finished") === "true") {
+                listEle.innerHTML = ""
+                grammarEle.innerHTML = ""
+                noteEle.innerHTML = eval(`json.setting.${LANG}.other.endText`)
+                listEle.setAttribute("data-list-name", "none")
+                page.input.copy("display")
             }
         }
-    }
-}
-
-// 获取当前指令的名称
-function getCommandName() {
-    var commandName = inputEle.value.split(" ")[0].split("/")[1]
-    if (commandName === "") {
-        return "undefined"
-    } else {
-        return inputEle.value.split(" ")[0].split("/")[1]
-    }
-}
-
-// 获取当前列表名称
-function getListName(model) {
-    var listName = listEle.getAttribute("data-list-name")
-    if (model === "display") {
-        for (var i = 0; i < document.querySelectorAll("#getListName").length; i++) {
-            document.querySelectorAll("#getListName")[i].innerHTML = listName
+    },
+    list: {
+        getListName: function (model) {
+            var listName = listEle.getAttribute("data-list-name")
+            if (model === "display") {
+                for (var i = 0; i < document.querySelectorAll("#getListName").length; i++) {
+                    document.querySelectorAll("#getListName")[i].innerHTML = listName
+                }
+            } else if (model == null) {
+                return listName
+            }
+        },
+        load: function () {},
+        search: function () {
+            var theLatestParameter = inputEle.value.split(" ")[inputEle.value.split(" ").length - 1]
+            var e = 0
+            for (var i = 0; i < listEle.querySelectorAll('.mdui-list-item').length; i++) {
+                listEle.querySelectorAll('.mdui-list-item')[i].style.display = "none"
+                if (listEle.querySelectorAll('#listName')[i].innerHTML.startsWith(theLatestParameter) == true || eval("/" + theLatestParameter + "/g.test(listEle.querySelectorAll('#listName')[i].innerHTML)") == true) {
+                    listEle.querySelectorAll('.mdui-list-item')[i].style.display = ""
+                    e++
+                }
+                if (e == 0) {
+                    if (listEle.querySelectorAll('#listInfo')[i].innerHTML.startsWith(theLatestParameter) == true || eval("/" + theLatestParameter + "/g.test(listEle.querySelectorAll('#listInfo')[i].innerHTML)") == true) {
+                        listEle.querySelectorAll('.mdui-list-item')[i].style.display = ""
+                    }
+                }
+            }
+        },
+        exhaustive: {}
+    },
+    custom: {
+        setURL: function (isWithoutReload) {
+            var allURL = document.querySelector("#customURL").value.split("\n")
+            if (allURL.length >= 1) {
+                var comment = document.createComment("Custom JavaScript")
+                document.body.appendChild(comment)
+                var realURL = new Array
+                for (var i = 0; i < allURL.length; i++) {
+                    if (allURL[i] !== "" && allURL[i].endsWith(".js")) {
+                        var script = document.createElement("script")
+                        script.src = allURL[i]
+                        document.body.appendChild(script)
+                        realURL.push(allURL[i])
+                    } else if (allURL[i] !== "" && allURL[i].endsWith("/user.json")) {
+                        var request = new XMLHttpRequest()
+                        request.open("get", allURL[i])
+                        request.send(null)
+                        request.onload = function () {
+                            if (request.status == 200) {
+                                json.user = JSON.parse(request.responseText)
+                            }
+                        }
+                        realURL.push(allURL[i])
+                    }
+                }
+            }
+            localStorage.setItem("customURL", `${realURL}`)
+            document.querySelector("#customURL").value = localStorage.getItem("customURL").split(",").join("\n")
+            if (isWithoutReload === true) return
+            location.reload()
+        },
+        setURLFromStorage: function () {
+            document.querySelector("#customURL").value = localStorage.getItem("customURL").split(",").join("\n")
+            this.setURL(true)
+        },
+        getURL: function () {
+            return localStorage.getItem("extendURL").split(",")
         }
-    } else if (model == null) {
-        return listName
-    }
-}
-
-// 开始编写
-function editBegin() {
-    commandLength = inputEle.value.split(" ").length
-    wikiEle.href = eval(`json.setting.${LANG}.other.commandURL`) + inputEle.value.split(" ")[0]
-    listEle.setAttribute("data-finished", "false")
-    copyFromInput("display")
-    if (commandLength === 1) {
-        loadList("command")
-        grammarEle.innerHTML = ""
-        noteEle.innerHTML = eval(`json.setting.${LANG}.other.beginText`)
-    }
-}
-
-// 结束编写
-function editEnd() {
-    if (listEle.getAttribute("data-finished") === "true") {
-        listEle.innerHTML = ""
-        grammarEle.innerHTML = ""
-        noteEle.innerHTML = eval(`json.setting.${LANG}.other.endText`)
-        listEle.setAttribute("data-list-name", "none")
-        copyFromInput("display")
-    }
-}
-
-// 复制输入框内容
-function copyFromInput(request) {
-    if (request === "copy") {
-        inputEle.select()
-        inputEle.setSelectionRange(0, inputEle.value.length)
-        document.execCommand('copy')
-        mdui.snackbar({
-            message: "已复制",
-            position: "left-top",
-            timeout: 2000,
-            closeOnOutsideClick: false
-        })
-    } else if (request === "display") {
-        if (listEle.getAttribute("data-finished") == "true") {
-            wikiEle.style.display = "none"
-            copyEle.style.display = ""
-        } else {
-            wikiEle.style.display = ""
-            copyEle.style.display = "none"
-        }
-    }
-}
-
-// 添加新变量
-function addToInput(request, str) {
-    if (request === "command") {
-        inputEle.value = document.querySelector('.mdui-list-item:hover').querySelector('.mdui-list-item-title').innerHTML        
-    } else if (request === "none") {
-        console.log("这只是个占位项")
-    } else if (request === "byExhaustive") {
-        inputEle.value += str
-    } else if (request === "default") {
-        inputEle.value = inputEle.value.split(" ", inputEle.value.split(" ").length - 1).join(" ") + " "
-        inputEle.value += document.querySelector('.mdui-list-item:hover').querySelector('.mdui-list-item-title').innerHTML
-    }
-}
-
-// 根据输入的内容检索列表
-function search() {
-    theLatestParameter = inputEle.value.split(" ")[inputEle.value.split(" ").length - 1]
-    var e = 0
-    for (var i = 0; i < listEle.querySelectorAll('.mdui-list-item').length; i++) {
-        listEle.querySelectorAll('.mdui-list-item')[i].style.display = "none"
-        if (listEle.querySelectorAll('#listName')[i].innerHTML.startsWith(theLatestParameter) == true || eval("/" + theLatestParameter + "/g.test(listEle.querySelectorAll('#listName')[i].innerHTML)") == true) {
-            listEle.querySelectorAll('.mdui-list-item')[i].style.display = ""
-            e++
-        }
-        if (e == 0) {
-            if (listEle.querySelectorAll('#listInfo')[i].innerHTML.startsWith(theLatestParameter) == true || eval("/" + theLatestParameter + "/g.test(listEle.querySelectorAll('#listInfo')[i].innerHTML)") == true) {
-                listEle.querySelectorAll('.mdui-list-item')[i].style.display = ""
+    },
+    settings: {
+        mduiThemeColor: {
+            origin: {
+                primary: "indigo",
+                accent: "pink"
+            },
+            set: function (primary, accent) {
+                var $ = mdui.$
+                $('body').removeClass(`mdui-theme-primary-${this.origin.primary}`)
+                $('body').removeClass(`mdui-theme-accent-${this.origin.accent}`)
+                this.origin = {
+                    primary: primary,
+                    accent: accent
+                }
+                localStorage.setItem("mduiThemeColor", `{primary: "${primary}", accent: "${accent}"}`)
+                $('body').addClass(`mdui-theme-primary-${primary}`)
+                $('body').addClass(`mdui-theme-accent-${accent}`)
+            },
+            setFromStorage: function () {
+                var storage = eval(`(${localStorage.getItem("mduiThemeColor")})`)
+                this.set(storage.primary, storage.accent)
+            },
+            get: function () {
+                return {
+                    primary: this.origin.primary,
+                    accent: this.origin.accent
+                }
             }
         }
     }
@@ -346,46 +382,6 @@ function exhaustive(request) {
     }
 }
 
-// 自定义
-const custom = {
-    setCustomURL: function (isWithoutReload) {
-        var allURL = document.querySelector("#customURL").value.split("\n")
-        if (allURL.length >= 1) {
-            var comment = document.createComment("Custom JavaScript")
-            document.body.appendChild(comment)
-            var realURL = new Array
-            for (var i = 0; i < allURL.length; i++) {
-                if (allURL[i] !== "" && allURL[i].endsWith(".js")) {
-                    var script = document.createElement("script")
-                    script.src = allURL[i]
-                    document.body.appendChild(script)
-                    realURL.push(allURL[i])
-                } else if (allURL[i] !== "" && allURL[i].endsWith("/user.json")) {
-                    var request = new XMLHttpRequest()
-                    request.open("get", allURL[i])
-                    request.send(null)
-                    request.onload = function () {
-                        if (request.status == 200) {
-                            json.user = JSON.parse(request.responseText)
-                        }
-                    }
-                    realURL.push(allURL[i])
-                }
-            }
-        }
-        localStorage.setItem("customURL", `${realURL}`)
-        document.querySelector("#customURL").value = localStorage.getItem("customURL").split(",").join("\n")
-        if (isWithoutReload === true) return
-        location.reload()
-    },
-    setCustomURLFromStorage: function () {
-        document.querySelector("#customURL").value = localStorage.getItem("customURL").split(",").join("\n")
-        this.setCustomURL(true)
-    },
-    getCustomURL: function () {
-        return localStorage.getItem("extendURL").split(",")
-    }
-}
 
 
 
@@ -404,13 +400,6 @@ const custom = {
 
 
 
-
-
-
-/**
- * 以下内容待改
- * 由于涉及核心操作，将于最后修改
- */
 
 function change() {  // 切换页面数据
     commandLength = inputEle.value.split(" ").length
