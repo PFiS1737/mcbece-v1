@@ -47,13 +47,7 @@
     - json.main.zh.grammar #指令语法
     - ...
 - 优化：30%
-    - 移动端工具对话框优化
-        - 重构侧边栏的html
-        - 根据页面宽度在页面初始化时执行
-    - 页面主题色切换
-        - 尝试参照 [DFFZMXJ/mdui-colour-pad](https://github.com/DFFZMXJ/mdui-colour-pad) 写一个 html
-    - 输入栏及语法提示栏上下位置切换
-        - 编写 setting.setAppbarPosition() 函数
+    - 移动端工具对话框内容优化
     - 切换页面语言的按钮
         - 编写 setting.setLanguage() 函数
     - 编写 exhaustive() 函数，对应穷举助手功能
