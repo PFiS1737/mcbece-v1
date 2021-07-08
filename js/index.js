@@ -433,8 +433,8 @@ function change() {  // 切换页面数据
 
 // 初始化
 window.onload = () => {
-    settings.mduiThemeColor.setMduiThemeColorFromStorage()
-    custom.setCustomURLFromStorage()
+    page.settings.mduiThemeColor.setFromStorage()
+    page.custom.setURLFromStorage()
     if (screen.width < 1024) {
         var comment = document.createComment("Eruda.js")
         document.body.appendChild(comment)
