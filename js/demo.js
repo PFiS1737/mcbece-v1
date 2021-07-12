@@ -5,9 +5,9 @@ function Change() {
   inputLength = inputEle.value.split(" ").length - 1
   grammarEle.innerHTML = ""
   noteEle.innerHTML = ""
-  if (eval(`json.main.${LANG}.list.command.filter(function(item){return item.name === "/${getCommandName()} "})`)[0] !== undefined) {
-    grammarEle.innerHTML = `<span id="0">${eval(`json.main.${LANG}.list.command.filter(function(item){return item.name === "/${getCommandName()} "})`)[0].name}</span>`
-    noteEle.innerHTML = `<span id="0">${eval(`json.main.${LANG}.list.command.filter(function(item){return item.name === "/${getCommandName()} "})`)[0].info}</span>`
+  if (eval(`json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.input.getCommandName()} "})`)[0] !== undefined) {
+    grammarEle.innerHTML = `<span id="0">${eval(`json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.input.getCommandName()} "})`)[0].name}</span>`
+    noteEle.innerHTML = `<span id="0">${eval(`json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.input.getCommandName()} "})`)[0].info}</span>`
   } else {
     noteEle.innerHTML = `未知的命令（此命令不存在于 json.main.${LANG}.list 中）`
   }
@@ -45,7 +45,7 @@ function Change() {
       noteEle.querySelector(`[id="${grammarEle.querySelectorAll("span:not([style='display: none;'])")[inputLength].id}"]`).style.display = "" //待改
     }
   }
-  loadGrammar(`json.main.${LANG}.grammar.${getCommandName()}[0]`)
+  loadGrammar(`json.main.${LANG}.grammar.${page.input.getCommandName()}[0]`)
 }
 
 Change()
