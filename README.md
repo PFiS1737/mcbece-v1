@@ -4,7 +4,7 @@
 ### 目前进度：以下仅为未完成任务
 
 > 重要通知：
-> > 用Object重写全部函数   ----2021.7.8
+> > 重写全部函数   ----2021.7.17
 
 - 主要html：79%
     - 编写 article#about 对应的介绍文章
@@ -13,8 +13,6 @@
     - 更新 add() 函数
     - 编写 selector() 函数
     - 编写 setting.setLanguage() 函数
-    - 编写 setting.setAppbarPosition() 函数
-    - 编写 window.onload 事件，进行初始化
     - ...
 - 主要json：5%
     - page.json.main.zh.list.command #指令 (只写了一点)
@@ -47,9 +45,7 @@
     - page.json.main.zh.grammar #指令语法
     - ...
 - 优化：30%
-    - 移动端工具对话框内容优化
     - 切换页面语言的按钮
         - 编写 setting.setLanguage() 函数
-    - 编写 exhaustive() 函数，对应穷举助手功能
     - 桌面端tab键支持
     - ...
