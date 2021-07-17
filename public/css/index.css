@@ -2,8 +2,7 @@
     display: none;
 }
 
-.mdui-list-item:hover > #listURL, 
-.mdui-toolbar > #listURL {
+.mdui-list-item:hover > #listURL {
     display: inline !important;
 }
 

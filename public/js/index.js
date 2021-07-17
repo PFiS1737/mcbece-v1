@@ -8,19 +8,19 @@ const copyEle = document.querySelector("#copy")
 // 常量
 const LANG = localStorage.getItem("language")
 
-// JSON
-const json = {
-    "main": {
-        "zh": {}
-    },
-    "setting": {
-        "zh": {}
-    },
-    "custom": {}
-}
 
 const page = {
+    json: {
+        main: {
+            zh: {}
+        },
+        custom: {}
+    },
+    text: {
+        
+    },
     change: function () {
+        var commandLength = inputEle.value.split(" ").length
         this.edit.begin()
         this.grammar.load()
         if (grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1] !== undefined) {
@@ -29,14 +29,14 @@ const page = {
         this.edit.finish()
     },
     input: {
-        add: function (request, str) {
-            if (request === "command") {
+        add: function (addRule, str) {
+            if (addRule === "command") {
                 inputEle.value = document.querySelector('.mdui-list-item:hover').querySelector('.mdui-list-item-title').innerHTML        
-            } else if (request === "none") {
+            } else if (addRule === "none") {
                 console.log("这只是个占位项")
-            } else if (request === "byExhaustive") {
+            } else if (addRule === "byExhaustive") {
                 inputEle.value += str
-            } else if (request === "default") {
+            } else if (addRule === "default") {
                 inputEle.value = inputEle.value.split(" ", inputEle.value.split(" ").length - 1).join(" ") + " "
                 inputEle.value += document.querySelector('.mdui-list-item:hover').querySelector('.mdui-list-item-title').innerHTML
             }
@@ -53,7 +53,7 @@ const page = {
                     closeOnOutsideClick: false
                 })
             } else if (request === "display") {
-                if (listEle.getAttribute("data-finished") == "true") {
+                if (listEle.getAttribute("data-edit-finished") == "true") {
                     wikiEle.style.display = "none"
                     copyEle.style.display = ""
                 } else {
@@ -82,7 +82,7 @@ const page = {
         begin: function () {
             var commandLength = inputEle.value.split(" ").length
             wikiEle.href = eval(`json.setting.${LANG}.other.commandURL`) + inputEle.value.split(" ")[0]
-            listEle.setAttribute("data-finished", "false")
+            listEle.setAttribute("data-edit-finished", "false")
             page.input.copy("display")
             if (inputEle.value === "") {
                 grammarEle.innerHTML = ""
@@ -90,7 +90,7 @@ const page = {
             }
         },
         finish: function () {
-            if (grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1] === undefined) {
+            if (listEle.getAttribute("data-edit-finished") === "true") {
                 listEle.innerHTML = ""
                 grammarEle.innerHTML = ""
                 noteEle.innerHTML = eval(`json.setting.${LANG}.other.endText`)
@@ -110,7 +110,113 @@ const page = {
                 return listName
             }
         },
-        load: function () {},
+        load: function (listName) {
+            if (listEle.getAttribute("data-list-name") !== `${listName}`) {
+                listEle.innerHTML = ""
+                listEle.setAttribute("data-list-name", `${listName}`)
+                function displayListImage(i, listName, dataName) {
+                    if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === undefined || eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === "" || eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === "none") {
+                        return ""
+                    } else {
+                        return `<div class="mdui-list-item-avatar"><img src="${eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`)}"/></div>`
+                    }
+                }
+                function displayListAddFunction(i, listName, dataName) {}
+                function displayListName(i, listName, dataName) {
+                    if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`) === undefined) {
+                        console.error(`列表 ${listName} 中，第 ${i} 项的“name” 是必须的。`)
+                    } else {
+                        return eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)
+                    }
+                }
+                function displayListInfo(i, listName, dataName) {
+                    if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`) === undefined) {
+                        return ""
+                    } else {
+                        return eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)
+                    }
+                }
+                function displayListURL(i, listName, dataName) {  // 待改
+                    var page = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url.page`)
+                    var text = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url.text`)
+                    if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url`) !== undefined) {
+                        
+                    } else {
+                        return ""
+                    }
+                    
+                    
+                    
+                    if (page === "search") {
+                        return `
+                    <a class="mdui-btn mdui-btn-icon" href="${eval(`json.setting.${LANG}.other.searchURL`) + eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)}" target="_blank" id="listURL">
+                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
+                    </a>`
+                    } else if (page === "name") {
+                        return `
+                    <a class="mdui-btn mdui-btn-icon" href="${eval(`json.setting.${LANG}.other.wikiURL`) + eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)}" target="_blank" id="listURL">
+                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
+                    </a>`
+                    } else if (page === "info") {
+                        return `
+                    <a class="mdui-btn mdui-btn-icon" href="${eval(`json.setting.${LANG}.other.wikiURL`) + eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)}" target="_blank" id="listURL">
+                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
+                    </a>`
+                    } else if (page === "command") {
+                        return `
+                    <a class="mdui-btn mdui-btn-icon" href="${eval(`json.setting.${LANG}.other.commandURL`) + eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)}" target="_blank" id="listURL">
+                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
+                    </a>`
+                    } else if (page === "none" || page === undefined || page === "") {
+                        return ""
+                    } else {
+                        return `
+                    <a class="mdui-btn mdui-btn-icon" href="${text}" target="_blank" id="listURL">
+                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
+                    </a>`
+                    }
+                }
+                if (eval(`page.json.main.${LANG}`) !== undefined) {
+                    if (eval(`page.json.main.${LANG}.list`) !== undefined) {
+                        if (eval(`page.json.main.${LANG}.list.${listName}`) !== undefined) {
+                            for (var i = 0; i < eval(`page.json.main.${LANG}.list.${listName}.length`); i++) {
+                                listEle.innerHTML += `
+                <li class="mdui-list-item mdui-ripple" id="${i}">
+                    ${displayListImage(i, listName, "main")}
+                    <div class="mdui-list-item-content" onclick="page.change();${displayListAddFunction(i, listName, "main")}">
+                        <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "main")}</div>
+                        <div class="mdui-list-item-text mdui-list-item-one-line">
+                            <span class="mdui-text-color-theme-text" id="listInfo">${displayListInfo(i, listName, "main")}</span>
+                        </div>
+                    </div>
+                    ${displayListURL(i, listName, "main")}
+                </li>`
+                            }
+                        }
+                    }
+                }
+                if (eval(`page.json.custom.${LANG}`) !== undefined) {
+                    if (eval(`page.json.custom.${LANG}.list`) !== undefined) {
+                        if (eval(`page.json.custom.${LANG}.list.${listName}`) !== undefined) {
+                            for (var i = 0; i < eval(`page.json.custom.${LANG}.list.${listName}.length`); i++) {
+                                listEle.innerHTML += `
+                <li class="mdui-list-item mdui-ripple" id="${i}">
+                    ${displayListImage(i, listName, "custom")}
+                    <div class="mdui-list-item-content" onclick="page.change();${displayListAddFunction(i, listName, "custom")}">
+                        <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "custom")}</div>
+                        <div class="mdui-list-item-text mdui-list-item-one-line">
+                            <span class="mdui-text-color-theme-text" id="listInfo">${displayListInfo(i, listName, "custom")}</span>
+                        </div>
+                    </div>
+                    ${displayListURL(i, listName, "custom")}
+                </li>`
+                            }
+                        }
+                    }
+                }
+                this.getListName("display")
+            }
+        },
         search: function () {
             var theLatestParameter = inputEle.value.split(" ")[inputEle.value.split(" ").length - 1]
             var e = 0
@@ -133,15 +239,15 @@ const page = {
         load: function () {
             grammarEle.innerHTML = ""
             noteEle.innerHTML = ""
-            if (eval(`json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.input.getCommandName()} "})`)[0] !== undefined) {
-                grammarEle.innerHTML = `<span id="0" data-grammar-command-length="0" data-grammar-cammand-list="command">${eval(`json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.input.getCommandName()} "})`)[0].name}</span>`
-                noteEle.innerHTML = `<span id="0" style="display: none;">${eval(`json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.input.getCommandName()} "})`)[0].info}</span>`
-                this.loadFromJson(`json.main.${LANG}.grammar.${page.input.getCommandName()}[0]`)
+            if (eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.input.getCommandName()} "})`)[0] !== undefined) {
+                grammarEle.innerHTML = `<span id="0" data-grammar-command-length="0" data-grammar-cammand-list="command">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.input.getCommandName()} "})`)[0].name}</span>`
+                noteEle.innerHTML = `<span id="0" style="display: none;">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.input.getCommandName()} "})`)[0].info}</span>`
+                this.loadFromJson(`page.json.main.${LANG}.grammar.${page.input.getCommandName()}[0]`)
                 this.display("grammarEle")
                 this.strong()
             } else {
                 grammarEle.innerHTML = `<span>${page.input.getCommandName()}</span>`
-                noteEle.innerHTML = `未知的命令（此命令不存在于 json.main.${LANG}.list.command 中）`
+                noteEle.innerHTML = `未知的命令（此命令不存在于 page.json.main.${LANG}.list.command 中）`
             }
         },
         loadFromJson: function (str) {
@@ -164,7 +270,7 @@ const page = {
                 }
             } else {
                 grammarEle.innerHTML = `<span>${page.input.getCommandName()}</span>`
-                noteEle.innerHTML = `未知的命令（此命令不存在于 json.main.${LANG}.grammar 中）`
+                noteEle.innerHTML = `未知的命令（此命令不存在于 page.json.main.${LANG}.grammar 中）`
             }
         },
         display: function () {
@@ -200,6 +306,8 @@ const page = {
                     noteEle.querySelectorAll("span")[i].style.display = "none"
                 }
                 noteEle.querySelector(`[id="${grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1].id}"]`).style.display = ""
+            } else {
+                listEle.setAttribute("data-edit-finished", "true")
             }
         }
     },
@@ -222,7 +330,7 @@ const page = {
                         request.send(null)
                         request.onload = function () {
                             if (request.status == 200) {
-                                json.custom = JSON.parse(request.responseText)
+                                page.json.custom = JSON.parse(request.responseText)
                             }
                         }
                         realURL.push(allURL[i])
@@ -274,95 +382,7 @@ const page = {
 }
 
 function loadList(listName) {
-    if (listEle.getAttribute("data-list-name") !== `${listName}`) {
-        listEle.innerHTML = ""
-        listEle.setAttribute("data-list-name", `${listName}`)
-        function displayListImage(i, listName, dataName) {
-            if (eval(`json.${dataName}.${LANG}.list.${listName}[i].image`) === undefined || eval(`json.${dataName}.${LANG}.list.${listName}[i].image`) === "" || eval(`json.${dataName}.${LANG}.list.${listName}[i].image`) === "none") {
-                return ""
-            } else {
-                return `<div class="mdui-list-item-avatar"><img src="${eval(`json.${dataName}.${LANG}.list.${listName}[i].image`)}"/></div>`
-            }
-        }
-        function displayListAddRule(i, listName, dataName) {  // 待写
-            eval(`json.${dataName}.${LANG}.list.${listName}[i].add`)
-        }
-        function displayListName(i, listName, dataName) {
-            if (eval(`json.${dataName}.${LANG}.list.${listName}[i].name`) === undefined) {
-                console.error(`列表 ${listName} 中，第 ${i} 项的“name”是必须的。`)
-            } else {
-                return eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)
-            }
-        }
-        function displayListInfo(i, listName, dataName) {
-            if (eval(`json.${dataName}.${LANG}.list.${listName}[i].info`) === undefined) {
-                return ""
-            } else {
-                return eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
-            }
-        }
-        function displayListURL(i, listName, dataName) {  // 待改
-            var displayRule = eval(`json.${dataName}.${LANG}.list.${listName}[i].url`)
-            if (displayRule === "search") {
-                return eval(`json.setting.${LANG}.other.searchURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
-            } else if (displayRule === "name") {
-                return eval(`json.setting.${LANG}.other.wikiURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)
-            } else if (displayRule === "info") {
-                return eval(`json.setting.${LANG}.other.wikiURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].info`)
-            } else if (displayRule === "command") {
-                return eval(`json.setting.${LANG}.other.commandURL`) + eval(`json.${dataName}.${LANG}.list.${listName}[i].name`)
-            } else if (displayRule === "none" || displayRule === undefined || displayRule === "") {
-                setTimeout(() => {
-                   listEle.querySelectorAll(".mdui-list-item")[i].removeChild(listEle.querySelectorAll('.mdui-list-item')[i].querySelector("#listURL"))  //需要自定义优化
-                }, 0)
-            } else {
-                return displayRule
-            }
-        }
-        if (eval(`json.main.${LANG}`) !== undefined) {
-            if (eval(`json.main.${LANG}.list`) !== undefined) {
-                if (eval(`json.main.${LANG}.list.${listName}`) !== undefined) {
-                    for (var i = 0; i < eval(`json.main.${LANG}.list.${listName}.length`); i++) {
-                        listEle.innerHTML += `
-                <li class="mdui-list-item mdui-ripple" id="${i}" name="">
-                    ${displayListImage(i, listName, "main")}
-                    <div class="mdui-list-item-content" onclick="add('${displayListAddRule(i, listName, "main")}'); change();">
-                        <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "main")}</div>
-                        <div class="mdui-list-item-text mdui-list-item-one-line">
-                            <span class="mdui-text-color-theme-text" id="listInfo">${displayListInfo(i, listName, "main")}</span>
-                        </div>
-                    </div>
-                    <a class="mdui-btn mdui-btn-icon" href="${displayListURL(i, listName, "main")}" target="_blank" id="listURL">
-                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
-                    </a>
-                </li>`
-                    }
-                }
-            }
-        }
-        if (eval(`json.custom.${LANG}`) !== undefined) {
-            if (eval(`json.custom.${LANG}.list`) !== undefined) {
-                if (eval(`json.custom.${LANG}.list.${listName}`) !== undefined) {
-                    for (var i = 0; i < eval(`json.custom.${LANG}.list.${listName}.length`); i++) {
-                        listEle.innerHTML += `
-                <li class="mdui-list-item mdui-ripple" id="${i}" name="">
-                    ${displayListImage(i, listName, "custom")}
-                    <div class="mdui-list-item-content" onclick="add('${displayListAddRule(i, listName, "custom")}'); change();">
-                        <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "custom")}</div>
-                        <div class="mdui-list-item-text mdui-list-item-one-line">
-                            <span class="mdui-text-color-theme-text" id="listInfo">${displayListInfo(i, listName, "custom")}</span>
-                        </div>
-                    </div>
-                    <a class="mdui-btn mdui-btn-icon" href="${displayListURL(i, listName, "custom")}" target="_blank" id="listURL">
-                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
-                    </a>
-                </li>`
-                    }
-                }
-            }
-        }
-        getListName("display")
-    }
+    
 }
 
 /** 穷举相关内容，暂不继续编写

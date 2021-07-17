@@ -1,0 +1,20 @@
+{
+  "format_version": [
+    1,
+    1,
+    0
+  ],
+  "sculk_sensor": {
+    "textures": {
+      "up": "sculk_sensor_top",
+      "down": "sculk_sensor_bottom",
+      "side": "sculk_sensor_side"
+    },
+    "carried_textures": {
+      "up": "sculk_sensor_tendril_inactive",
+      "down": "sculk_sensor_tendril_inactive",
+      "side": "sculk_sensor_tendril_active"
+    },
+    "sound": "sculk_sensor"
+  }
+}

@@ -17,35 +17,18 @@ request2.onload = function() {
     }
 }
 var request3 = new XMLHttpRequest()
-var sound_115
-request3.open("get", "./sound_115.json")// from 
+var sound_cave
+request3.open("get", "./sound_cave.json")// from 
 request3.send(null)
 request3.onload = function() {
     if (request3.status == 200) {
-        sound_115 = JSON.parse(request3.responseText)
-    }
-}
-var request4 = new XMLHttpRequest()
-var sound_cave
-request4.open("get", "./sound_cave.json")// from 
-request4.send(null)
-request4.onload = function() {
-    if (request4.status == 200) {
-        sound_cave = JSON.parse(request4.responseText)
+        sound_cave = JSON.parse(request3.responseText)
     }
 }
 
 var arr = new Array
 setTimeout(() => {
-    for (var i in sound) {
-        arr.push({
-            "name": i.toLowerCase(),
-            "info": "",
-            "url": "info",
-            "add": "default"
-        })
-    }
-    for (var i in sound_115) {
+    for (var i in sound.sound_definitions) {
         arr.push({
             "name": i.toLowerCase(),
             "info": "",
@@ -72,7 +55,7 @@ setTimeout(() => {
     (function () {
         var blob = new Blob([JSON.stringify(arr)], {type: 'application/json'});
         var link = document.querySelector("a")
-        link.download = "main.list.block.json"
+        link.download = "main.list.sound.json"
         link.href = URL.createObjectURL(blob)
     })()
 }, 1000)
