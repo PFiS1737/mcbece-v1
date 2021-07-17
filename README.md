@@ -6,14 +6,12 @@
 > 重要通知：
 > > 重写全部函数   ----2021.7.17
 
-- 主要html：79%
-    - 编写 article#about 对应的介绍文章
+- 主要html：90%
     - 编写 div#setting 对应的设置列表
+    - 其他优化
 - 主要js：70%
-    - 更新 add() 函数
-    - 编写 selector() 函数
-    - 编写 setting.setLanguage() 函数
-    - ...
+    - 编写 page.command.selector() 函数
+    - 编写 page.setting.setLanguage() 函数
 - 主要json：5%
     - page.json.main.zh.list.command #指令 (只写了一点)
     - page.json.main.zh.list.selector.parameter #选择器变量
