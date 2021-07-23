@@ -731,9 +731,9 @@ page.json.main.zh = {
                             {
                                 "text": "detect",
                                 "note": "检测方块。",
-                                "judge": "/\bdetect\b/g",
+                                "judge": "/\\bdetect\\b/g",
                                 "length": "3",
-                                "list": "executeCommand",
+                                "list": "executeCommandWithDetect",
                                 "next": [
                                     {
                                         "text": "<探测坐标：x y z>",
@@ -756,7 +756,7 @@ page.json.main.zh = {
                                                             {
                                                                 "text": "<命令：命令>",
                                                                 "note": "指定要运行的命令。",
-                                                                "list": "command",
+                                                                "list": "executeCommand",
                                                                 "length": "7",
                                                                 "next": [
                                                                     "End"
@@ -781,7 +781,6 @@ page.json.main.zh = {
                 "note": "指定要定位的结构。",
                 "list": "locate",
                 "length": "1",
-                "exhaustive": "true",
                 "next": [
                     "End"
                 ]

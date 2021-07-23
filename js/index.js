@@ -5,11 +5,12 @@ const listEle = document.querySelector("#list")
 const wikiEle = document.querySelector("#wiki")
 const copyEle = document.querySelector("#copy")
 
-// 常量
-const LANG = localStorage.getItem("language")
-
+let LANG = ""
 
 const page = {
+    language: {
+        zh: "中文（简体）"
+    },
     json: {
         main: {
             zh: {}
@@ -17,29 +18,45 @@ const page = {
         custom: {}
     },
     text: {
-        
+        url: {
+            command_page: {
+                zh: "https://minecraft.fandom.com/zh/wiki/命令"
+            },
+            normal_page: {
+                zh: "https://minecraft.fandom.com/zh/wiki/"
+            },
+            search_page: {
+                zh: "https://minecraft.fandom.com/zh/wiki/Special:搜索?search="
+            }
+        },
+        inputText: {
+            zh: "开始编写"
+        },
+        beginText: {
+            zh: "输入任何内容开始编写"
+        },
+        endText: {
+            zh: "已完成编写"
+        }
     },
     change: function () {
         var commandLength = inputEle.value.split(" ").length
         this.edit.begin()
-        this.grammar.load()
+        if (inputEle.value === "") return
+        this.grammarEle.load()
         if (grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1] !== undefined) {
-            this.list.load(`${grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1].getAttribute("data-grammar-cammand-list")}`)
+            this.listEle.load(`${grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1].getAttribute("data-grammar-cammand-list")}`)
         }
         this.edit.finish()
     },
-    input: {
-        add: function (addRule, str) {
-            if (addRule === "command") {
-                inputEle.value = document.querySelector('.mdui-list-item:hover').querySelector('.mdui-list-item-title').innerHTML        
-            } else if (addRule === "none") {
-                console.log("这只是个占位项")
-            } else if (addRule === "byExhaustive") {
-                inputEle.value += str
-            } else if (addRule === "default") {
+    inputEle: {
+        add: function (text, isReplaceAll) {
+            if (isReplaceAll === true) {
+                inputEle.value = ""
+            } else {
                 inputEle.value = inputEle.value.split(" ", inputEle.value.split(" ").length - 1).join(" ") + " "
-                inputEle.value += document.querySelector('.mdui-list-item:hover').querySelector('.mdui-list-item-title').innerHTML
             }
+            inputEle.value += text
         },
         copy: function (request) {
             if (request === "copy") {
@@ -81,39 +98,40 @@ const page = {
     edit: {
         begin: function () {
             var commandLength = inputEle.value.split(" ").length
-            wikiEle.href = eval(`json.setting.${LANG}.other.commandURL`) + inputEle.value.split(" ")[0]
+            wikiEle.href = eval(`page.text.url.command_page.${LANG}`) + inputEle.value.split(" ")[0]
             listEle.setAttribute("data-edit-finished", "false")
-            page.input.copy("display")
+            page.inputEle.copy("display")
+            if (commandLength === 1) {
+                page.listEle.load("command")
+            }
             if (inputEle.value === "") {
                 grammarEle.innerHTML = ""
-                noteEle.innerHTML = eval(`json.setting.${LANG}.other.beginText`)
+                noteEle.innerHTML = eval(`page.text.beginText.${LANG}`)
             }
         },
         finish: function () {
             if (listEle.getAttribute("data-edit-finished") === "true") {
                 listEle.innerHTML = ""
                 grammarEle.innerHTML = ""
-                noteEle.innerHTML = eval(`json.setting.${LANG}.other.endText`)
+                noteEle.innerHTML = eval(`page.text.endText.${LANG}`)
                 listEle.setAttribute("data-list-name", "none")
-                page.input.copy("display")
+                page.inputEle.copy("display")
             }
         }
     },
-    list: {
+    listEle: {
         getListName: function (model) {
             var listName = listEle.getAttribute("data-list-name")
             if (model === "display") {
                 for (var i = 0; i < document.querySelectorAll("#getListName").length; i++) {
                     document.querySelectorAll("#getListName")[i].innerHTML = listName
                 }
-            } else if (model == null) {
+            } else if (typeof model === undefined) {
                 return listName
             }
         },
         load: function (listName) {
             if (listEle.getAttribute("data-list-name") !== `${listName}`) {
-                listEle.innerHTML = ""
-                listEle.setAttribute("data-list-name", `${listName}`)
                 function displayListImage(i, listName, dataName) {
                     if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === undefined || eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === "" || eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === "none") {
                         return ""
@@ -121,7 +139,33 @@ const page = {
                         return `<div class="mdui-list-item-avatar"><img src="${eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`)}"/></div>`
                     }
                 }
-                function displayListAddFunction(i, listName, dataName) {}
+                function displayListAddFunction(i, listName, dataName) {
+                    if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].add`) !== undefined) {
+                        var output = {
+                            text: "",
+                            isWithoutReload: ""
+                        }
+                        var rule = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].add.rule`)
+                        var text = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].add.text`)
+                        if (text === "none" || text === undefined) {
+                            output.text = ""
+                        } else if (text === "name") {
+                            output.text = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)
+                        } else if (text === "info") {
+                            output.text = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)
+                        }
+                        for (var i = 0; i < rule.length; i++) {
+                            if (rule[i] === "replace_all") {
+                                output.isReplaceAll = true
+                            } else if (rule[i] === "with_space_after") {
+                                output.text += " "
+                            }
+                        }
+                        return `page.inputEle.add('${output.text}', ${output.isReplaceAll})`
+                    } else {
+                        return "page.inputEle.add('',)"
+                    }
+                }
                 function displayListName(i, listName, dataName) {
                     if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`) === undefined) {
                         console.error(`列表 ${listName} 中，第 ${i} 项的“name” 是必须的。`)
@@ -136,58 +180,46 @@ const page = {
                         return eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)
                     }
                 }
-                function displayListURL(i, listName, dataName) {  // 待改
-                    var page = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url.page`)
-                    var text = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url.text`)
+                function displayListURL(i, listName, dataName) {
                     if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url`) !== undefined) {
-                        
+                        var output
+                        this.page = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url.page`)
+                        this.text = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url.text`)
+                        if (this.page === "none" || this.page === "" || this.page === undefined) {
+                            return ""
+                        } else if (this.page === "command_page") {
+                            output = eval(`page.text.url.command_page.${LANG}`)
+                        } else if (this.page === "normal_page") {
+                            output = eval(`page.text.url.normal_page.${LANG}`)
+                        }  else if (this.page === "search_page") {
+                            output = eval(`page.text.url.search_page.${LANG}`)
+                        } else if (this.page === "custom") {
+                            return `<a class="mdui-btn mdui-btn-icon mdui-list-item-display-when-hover" href="${this.text}" target="_blank" id="listURL"><i class="mdui-icon material-icons mdui-text-color-black-icon">send</i></a>`
+                        }
+                        if (this.text === "none" || this.text === undefined) {
+                            output += ""
+                        } else if (this.text === "name") {
+                            output += eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)
+                        } else if (this.text === "info") {
+                            output += eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)
+                        }
+                        return `<a class="mdui-btn mdui-btn-icon mdui-list-item-display-when-hover" href="${output}" target="_blank" id="listURL"><i class="mdui-icon material-icons mdui-text-color-black-icon">send</i></a>`
                     } else {
                         return ""
-                    }
-                    
-                    
-                    
-                    if (page === "search") {
-                        return `
-                    <a class="mdui-btn mdui-btn-icon" href="${eval(`json.setting.${LANG}.other.searchURL`) + eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)}" target="_blank" id="listURL">
-                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
-                    </a>`
-                    } else if (page === "name") {
-                        return `
-                    <a class="mdui-btn mdui-btn-icon" href="${eval(`json.setting.${LANG}.other.wikiURL`) + eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)}" target="_blank" id="listURL">
-                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
-                    </a>`
-                    } else if (page === "info") {
-                        return `
-                    <a class="mdui-btn mdui-btn-icon" href="${eval(`json.setting.${LANG}.other.wikiURL`) + eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)}" target="_blank" id="listURL">
-                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
-                    </a>`
-                    } else if (page === "command") {
-                        return `
-                    <a class="mdui-btn mdui-btn-icon" href="${eval(`json.setting.${LANG}.other.commandURL`) + eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)}" target="_blank" id="listURL">
-                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
-                    </a>`
-                    } else if (page === "none" || page === undefined || page === "") {
-                        return ""
-                    } else {
-                        return `
-                    <a class="mdui-btn mdui-btn-icon" href="${text}" target="_blank" id="listURL">
-                        <i class="mdui-icon material-icons mdui-text-color-black-icon">send</i>
-                    </a>`
                     }
                 }
                 if (eval(`page.json.main.${LANG}`) !== undefined) {
                     if (eval(`page.json.main.${LANG}.list`) !== undefined) {
                         if (eval(`page.json.main.${LANG}.list.${listName}`) !== undefined) {
+                            listEle.innerHTML = ""
+                            listEle.setAttribute("data-list-name", `${listName}`)
                             for (var i = 0; i < eval(`page.json.main.${LANG}.list.${listName}.length`); i++) {
                                 listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}">
                     ${displayListImage(i, listName, "main")}
-                    <div class="mdui-list-item-content" onclick="page.change();${displayListAddFunction(i, listName, "main")}">
+                    <div class="mdui-list-item-content" onclick="${displayListAddFunction(i, listName, "main")}; page.change()">
                         <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "main")}</div>
-                        <div class="mdui-list-item-text mdui-list-item-one-line">
-                            <span class="mdui-text-color-theme-text" id="listInfo">${displayListInfo(i, listName, "main")}</span>
-                        </div>
+                        <div class="mdui-list-item-text mdui-list-item-one-line" id="listInfo">${displayListInfo(i, listName, "main")}</div>
                     </div>
                     ${displayListURL(i, listName, "main")}
                 </li>`
@@ -202,11 +234,9 @@ const page = {
                                 listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}">
                     ${displayListImage(i, listName, "custom")}
-                    <div class="mdui-list-item-content" onclick="page.change();${displayListAddFunction(i, listName, "custom")}">
+                    <div class="mdui-list-item-content" onclick="${displayListAddFunction(i, listName, "custom")}; page.change()">
                         <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "custom")}</div>
-                        <div class="mdui-list-item-text mdui-list-item-one-line">
-                            <span class="mdui-text-color-theme-text" id="listInfo">${displayListInfo(i, listName, "custom")}</span>
-                        </div>
+                        <div class="mdui-list-item-text mdui-list-item-one-line" id="listInfo">${displayListInfo(i, listName, "custom")}</div>
                     </div>
                     ${displayListURL(i, listName, "custom")}
                 </li>`
@@ -215,6 +245,7 @@ const page = {
                     }
                 }
                 this.getListName("display")
+                this.exhaustive.judge()
             }
         },
         search: function () {
@@ -233,47 +264,132 @@ const page = {
                 }
             }
         },
-        exhaustive: {}
+        exhaustive: {
+            judge: function () {
+                var commandLength = inputEle.value.split(" ").length
+                if (grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1] !== undefined) {
+                    listEle.setAttribute("data-is-exhaustive", "false")
+                    document.querySelector("#Exhaustive-card").style.display = "none"
+                    if (grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1].getAttribute("data-grammar-cammand-exhaustive") === "true") {
+                        document.querySelector("#Exhaustive-card").style.display = ""
+                        listEle.setAttribute("data-is-exhaustive", "true")
+                        mdui.snackbar({
+                            message: "此列表可以穷举（点击浮动按钮了解更多）",
+                            position: "left-top",
+                            timeout: 2000,
+                            closeOnOutsideClick: false
+                        })
+                        for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
+                            listEle.querySelectorAll(".mdui-list-item")[i].innerHTML = `
+                    <label class="mdui-checkbox">
+                        <input type="checkbox"/>
+                        <i class="mdui-checkbox-icon" style="margin-left: 9px;"></i>
+                    </label>` + listEle.querySelectorAll(".mdui-list-item")[i].innerHTML
+                            listEle.querySelectorAll("label")[i].addEventListener("click", () => {
+                                for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
+                                    if (listEle.querySelectorAll(".mdui-list-item")[i].querySelector("input").checked == true) {
+                                        listEle.querySelectorAll(".mdui-list-item")[i].classList.add("mdui-list-item-active")
+                                    } else {
+                                        listEle.querySelectorAll(".mdui-list-item")[i].classList.remove("mdui-list-item-active")
+                                    }
+                                }
+                            })
+                        }
+                    }
+                }
+            },
+            button: {
+                select: {
+                    all: function () {
+                        if (listEle.getAttribute("data-is-exhaustive") === "true") {
+                            for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
+                                listEle.querySelectorAll("input")[i].checked = true
+                                listEle.querySelectorAll(".mdui-list-item")[i].classList.add("mdui-list-item-active")
+                            }
+                        }
+                    },
+                    none: function () {
+                        if (listEle.getAttribute("data-is-exhaustive") === "true") {
+                            for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
+                                listEle.querySelectorAll("input")[i].checked = false
+                                listEle.querySelectorAll(".mdui-list-item")[i].classList.remove("mdui-list-item-active")
+                            }
+                        }
+                    },
+                    back: function () {
+                        if (listEle.getAttribute("data-is-exhaustive") === "true") {
+                            for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
+                                if (listEle.querySelectorAll("input")[i].checked == true) {
+                                    listEle.querySelectorAll("input")[i].checked = false
+                                    listEle.querySelectorAll(".mdui-list-item")[i].classList.remove("mdui-list-item-active")
+                                } else {
+                                    listEle.querySelectorAll("input")[i].checked = true
+                                    listEle.querySelectorAll(".mdui-list-item")[i].classList.add("mdui-list-item-active")
+                                }
+                            }
+                        }
+                    }
+                },
+                add: function () {
+                    if (listEle.getAttribute("data-is-exhaustive") == "true") {
+                        page.inputEle.add(page.listEle.exhaustive.output())
+                    }
+                }
+            },
+            preview: function () {
+                if (listEle.getAttribute("data-is-exhaustive") == "true") {
+                    document.querySelector(`${document.querySelector("#Exhaustive-tool").querySelector(".mdui-tab-active").href}`).querySelector("#getExhaustivePreview").value = outputExhaustive()
+                }
+            },
+            output: function () {}
+        }
     },
-    grammar: {
+    grammarEle: {
         load: function () {
             grammarEle.innerHTML = ""
             noteEle.innerHTML = ""
-            if (eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.input.getCommandName()} "})`)[0] !== undefined) {
-                grammarEle.innerHTML = `<span id="0" data-grammar-command-length="0" data-grammar-cammand-list="command">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.input.getCommandName()} "})`)[0].name}</span>`
-                noteEle.innerHTML = `<span id="0" style="display: none;">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.input.getCommandName()} "})`)[0].info}</span>`
-                this.loadFromJson(`page.json.main.${LANG}.grammar.${page.input.getCommandName()}[0]`)
+            if (eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.inputEle.getCommandName()}"})`)[0] !== undefined) {
+                grammarEle.innerHTML = `<span id="0" data-grammar-command-length="0" data-grammar-cammand-list="command">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.inputEle.getCommandName()}"})`)[0].name} </span>`
+                noteEle.innerHTML = `<span id="0" style="display: none;">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.inputEle.getCommandName()}"})`)[0].info}</span>`
+                this.loadFromJson(`page.json.main.${LANG}.grammar.${page.inputEle.getCommandName()}[0]`)
                 this.display("grammarEle")
                 this.strong()
             } else {
-                grammarEle.innerHTML = `<span>${page.input.getCommandName()}</span>`
+                grammarEle.innerHTML = `<span>/${page.inputEle.getCommandName()} </span>`
                 noteEle.innerHTML = `未知的命令（此命令不存在于 page.json.main.${LANG}.list.command 中）`
             }
         },
-        loadFromJson: function (str) {
-            var i = 1
+        loadFromJson: function (str, i = 1) {
             var thisGrammarEle = grammarEle.querySelectorAll("span.part")[document.querySelectorAll("span.part").length - 1] || grammarEle
             if (eval(str.split("[", str.split("[").length - 1).join("[")) !== undefined) {
                 if (eval(str.split("[", str.split("[").length - 1).join("[")).length > 1) {
                     for (var e = 0; e < eval(str.split("[", str.split("[").length - 1).join("[")).length; e++) {
                         str = str.split("[", str.split("[").length - 1).join("[") + `[${e}]`
-                        thisGrammarEle.innerHTML += `<span id="${i}" data-grammar-command-length="${eval(`${str}.length`)}" data-grammar-cammand-list="${eval(`${str}.list`)}" data-grammar-judge="${eval(`${str}.judge`)}" class="part mdui-hidden" style="font-weight: normal !important;">${eval(`${str}.text`)} </span>`
+                        if (eval(`${str}.exhaustive`) === "true") {
+                            thisGrammarEle.innerHTML += `<span id="${i}" data-grammar-command-length="${eval(`${str}.length`)}" data-grammar-cammand-list="${eval(`${str}.list`)}" data-grammar-cammand-exhaustive="true" data-grammar-judge="${eval(`${str}.judge`)}" class="part mdui-hidden" style="font-weight: normal !important;">${eval(`${str}.text`)} </span>`
+                        } else {
+                            thisGrammarEle.innerHTML += `<span id="${i}" data-grammar-command-length="${eval(`${str}.length`)}" data-grammar-cammand-list="${eval(`${str}.list`)}" data-grammar-judge="${eval(`${str}.judge`)}" class="part mdui-hidden" style="font-weight: normal !important;">${eval(`${str}.text`)} </span>`
+                        }
                         noteEle.innerHTML += `<span id="${i}" style="display: none;">${eval(`${str}.note`)}</span>`
                         i++
-                        this.loadFromJson(`${str}.next[0]`)
+                        this.loadFromJson(`${str}.next[0]`, i)
                     }
                 } else if (eval(str) !== "End") {
-                    thisGrammarEle.innerHTML += `<span id="${i}" data-grammar-command-length="${eval(`${str}.length`)}" data-grammar-cammand-list="${eval(`${str}.list`)}" class="mdui-hidden" style="font-weight: normal !important;">${eval(`${str}.text`)} </span>`
+                    if (eval(`${str}.exhaustive`) === "true") {
+                            thisGrammarEle.innerHTML += `<span id="${i}" data-grammar-command-length="${eval(`${str}.length`)}" data-grammar-cammand-list="${eval(`${str}.list`)}" data-grammar-cammand-exhaustive="true" class="mdui-hidden" style="font-weight: normal !important;">${eval(`${str}.text`)} </span>`
+                        } else {
+                            thisGrammarEle.innerHTML += `<span id="${i}" data-grammar-command-length="${eval(`${str}.length`)}" data-grammar-cammand-list="${eval(`${str}.list`)}" class="mdui-hidden" style="font-weight: normal !important;">${eval(`${str}.text`)} </span>`
+                        }
                     noteEle.innerHTML += `<span id="${i}" style="display: none;">${eval(`${str}.note`)}</span>`
                     i++
-                    this.loadFromJson(`${str}.next[0]`)
+                    this.loadFromJson(`${str}.next[0]`, i)
                 }
             } else {
-                grammarEle.innerHTML = `<span>${page.input.getCommandName()}</span>`
+                grammarEle.innerHTML = `<span>${page.inputEle.getCommandName()}</span>`
                 noteEle.innerHTML = `未知的命令（此命令不存在于 page.json.main.${LANG}.grammar 中）`
             }
         },
-        display: function () {
+        display: function (element) {
             if (eval(`${element}.querySelectorAll("span").length`) !== 0) {
                 for (var i = 0; i < eval(`${element}.querySelectorAll("span").length`); i++) {
                     if (eval(`${element}.querySelectorAll("span")[${i}].classList.contains("part")`) === true) break
@@ -286,7 +402,7 @@ const page = {
                     for (var x = 0; x < eval(`${element}.querySelectorAll("span.part").length`); x++) {
                         eval(`${element}.querySelectorAll("span.part")[${x}].classList.add("mdui-hidden")`)
                     }
-                    if (eval(`${eval(`${element}.querySelectorAll("span.part")[${i}].getAttribute("data-grammar-judge")`)}.test("${getParameterByLength(eval(`${element}.querySelectorAll("span.part")[${i}].getAttribute("data-grammar-command-length")`))}")`) === true && e < 1) {
+                    if (eval(`${eval(`${element}.querySelectorAll("span.part")[${i}].getAttribute("data-grammar-judge")`)}.test("${page.inputEle.getParameterByLength(eval(`${element}.querySelectorAll("span.part")[${i}].getAttribute("data-grammar-command-length")`))}")`) === true && e < 1) {
                         eval(`${element}.querySelectorAll("span.part")[${i}].classList.remove("mdui-hidden")`)
                         e++
                         break
@@ -350,7 +466,36 @@ const page = {
             return localStorage.getItem("extendURL").split(",")
         }
     },
-    settings: {
+    setting: {
+        developer: {
+            eruda: {
+                set: function (value) {
+                    if (value === "true" || value === "false") {
+                        localStorage.setItem("eruda", value)
+                    }
+                },
+                get: function () {
+                    return localStorage.getItem("eruda")
+                }
+            }
+        },
+        language: {
+            available: {
+                zh: "中文（简体）"
+            },
+            set: function (lang) {
+                if (this.available.filter(function(item){return item === lang})) {
+                    localStorage.setItem("language", lang)
+                }
+                LANG = localStorage.getItem("language")
+            },
+            setFromStorage: function () {
+                LANG = localStorage.getItem("language")
+            },
+            get: function () {
+                return localStorage.getItem("language")
+            }
+        },
         mduiThemeColor: {
             origin: {
                 primary: "indigo",
@@ -381,113 +526,34 @@ const page = {
     }
 }
 
-function loadList(listName) {
-    
-}
 
-/** 穷举相关内容，暂不继续编写
+
+
 function exhaustive(request) {
-    var activeTab
-    activeTab = document.querySelector("#Exhaustive-tool").querySelector(".mdui-tab-active").href
-
-    listEle.setAttribute("data-is-exhaustive", "false")
-    document.querySelector("#Exhaustive-card").style.display = "none"
-
-    document.querySelector("#Exhaustive-card").style.display = ""
-    listEle.setAttribute("data-is-exhaustive", "true")
-
-    mdui.snackbar({
-        message: "此列表可以穷举（点击浮动按钮了解更多）",
-        position: "left-top",
-        timeout: 2000,
-        closeOnOutsideClick: false
-    })
-    for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
-        listEle.querySelectorAll(".mdui-list-item")[i].innerHTML = `
-                    <label class="mdui-checkbox">
-                        <input type="checkbox"/>
-                        <i class="mdui-checkbox-icon" style="margin-left: 9px;"></i>
-                    </label>` + listEle.querySelectorAll(".mdui-list-item")[i].innerHTML
-        listEle.querySelectorAll("label")[i].addEventListener("click", () => {
-            for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
-                if (listEle.querySelectorAll(".mdui-list-item")[i].querySelector("input").checked == true) {
-                    listEle.querySelectorAll(".mdui-list-item")[i].classList.add("mdui-list-item-active")
-                } else {
-                    listEle.querySelectorAll(".mdui-list-item")[i].classList.remove("mdui-list-item-active")
-                }
-            }
-
-        })
-    }
-
+    
+    
+    
+    var activeTab = document.querySelector("#Exhaustive-tool").querySelector(".mdui-tab-active").href
+    
+    
+    
     function getExhaustivePreinstall() {
         theLatestParameter = inputEle.value.split(" ")[inputEle.value.split(" ").length - 1]
     }
+    
+    
+    
+    
     function exhaustiveOutput() {
         var output = ""
-        if (activeTab === "Exhaustive-tab1-byList") {
+        if (document.querySelector("#Exhaustive-tool").querySelector(".mdui-tab-active").href === "#Exhaustive-tab1-byList") {
 
-        } else if (activeTab === "Exhaustive-tab2-byInput") {
+        } else if (document.querySelector("#Exhaustive-tool").querySelector(".mdui-tab-active").href === "#Exhaustive-tab2-byInput") {
             for (var i = 0; i < document.querySelector(`${activeTab}`).querySelector("#setExhaustiveInput").value.split("\n").length; i++) {
                 var exhaustiveItem = document.querySelector(`${activeTab}`).querySelector("#setExhaustiveInput").value.split("\n")[i]
                 output += `${getExhaustivePreinstall()}${exhaustiveItem},`
             }
         }
         return output
-    }
-    function listActive() {
-        if (listEle.getAttribute("data-is-exhaustive") === "true") {
-            for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
-                if (listEle.querySelectorAll("input")[i].checked == true) {
-                    listEle.querySelectorAll(".mdui-list-item")[i].classList.add("mdui-list-item-active")
-                } else {
-                    listEle.querySelectorAll(".mdui-list-item")[i].classList.remove("mdui-list-item-active")
-                }
-            }
-        }
-    }
-    if (listEle.getAttribute("data-is-exhaustive") == "true") {
-        if (request === "selectAll") {
-            for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
-                listEle.querySelectorAll("input")[i].checked = true
-                listActive()
-            }
-        } else if (request === "selectNone") {
-            for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
-                listEle.querySelectorAll("input")[i].checked = false
-                listActive()
-            }
-        } else if (request === "selectBack") {
-            for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
-                if (listEle.querySelectorAll("input")[i].checked == true) {
-                    listEle.querySelectorAll("input")[i].checked = false
-                    listActive()
-                } else {
-                    listEle.querySelectorAll("input")[i].checked = true
-                    listActive()
-                }
-            }
-        } else if (request === "preview") {
-            document.querySelector(`${activeTab}`).querySelector("#getExhaustivePreview").value = outputExhaustive()
-        } else if (request === "add") {
-            add("byExhaustive", outputExhaustive())
-        }
-    }
-}
-*/
-
-// 初始化
-window.onload = () => {
-    page.settings.mduiThemeColor.setFromStorage()
-    page.custom.setURLFromStorage()
-    if (screen.width < 1024) {
-        var comment = document.createComment("Eruda.js")
-        document.body.appendChild(comment)
-        var script = document.createElement("script")
-        script.src = "https://cdn.staticfile.org/eruda/2.4.1/eruda.min.js"
-        document.body.appendChild(script)
-        script.onload = function () {
-            eruda.init()
-        }
     }
 }
