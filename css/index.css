@@ -11,6 +11,7 @@
 @media (max-height: 599.9px) {
     body {
         padding-top: 45px !important;
+        padding-bottom: 40px !important;
     }
     
     .mdui-fab {
@@ -92,6 +93,7 @@
 
 body.thin-model {
     padding-top: 45px !important;
+    padding-bottom: 40px !important;
 }
 
 body.thin-model .mdui-fab {

@@ -8,9 +8,6 @@ const copyEle = document.querySelector("#copy")
 let LANG = ""
 
 const page = {
-    language: {
-        zh: "中文（简体）"
-    },
     json: {
         main: {
             zh: {}
@@ -18,26 +15,14 @@ const page = {
         custom: {}
     },
     text: {
-        url: {
-            command_page: {
-                zh: "https://minecraft.fandom.com/zh/wiki/命令"
-            },
-            normal_page: {
-                zh: "https://minecraft.fandom.com/zh/wiki/"
-            },
-            search_page: {
-                zh: "https://minecraft.fandom.com/zh/wiki/Special:搜索?search="
-            }
-        },
-        inputText: {
-            zh: "开始编写"
-        },
-        beginText: {
-            zh: "输入任何内容开始编写"
-        },
-        endText: {
-            zh: "已完成编写"
+        zh: {}
+    },
+    initialization: function () {
+        inputEle.oninput = () => {
+            page.change()
+            page.listEle.search()
         }
+        this.edit.begin()
     },
     change: function () {
         var commandLength = inputEle.value.split(" ").length
@@ -50,9 +35,11 @@ const page = {
         this.edit.finish()
     },
     inputEle: {
-        add: function (text, isReplaceAll) {
-            if (isReplaceAll === true) {
+        input: function (text, replace) {
+            if (replace === "all") {
                 inputEle.value = ""
+            } else if (replace === "none") {
+                inputEle.value = inputEle.value
             } else {
                 inputEle.value = inputEle.value.split(" ", inputEle.value.split(" ").length - 1).join(" ") + " "
             }
@@ -98,22 +85,23 @@ const page = {
     edit: {
         begin: function () {
             var commandLength = inputEle.value.split(" ").length
-            wikiEle.href = eval(`page.text.url.command_page.${LANG}`) + inputEle.value.split(" ")[0]
+            wikiEle.href = eval(`page.text.${LANG}.url.command_page`) + inputEle.value.split(" ")[0]
             listEle.setAttribute("data-edit-finished", "false")
             page.inputEle.copy("display")
             if (commandLength === 1) {
                 page.listEle.load("command")
             }
             if (inputEle.value === "") {
+                inputEle.placeholder = eval(`page.text.${LANG}.inputText`)
                 grammarEle.innerHTML = ""
-                noteEle.innerHTML = eval(`page.text.beginText.${LANG}`)
+                noteEle.innerHTML = eval(`page.text.${LANG}.beginText`)
             }
         },
         finish: function () {
             if (listEle.getAttribute("data-edit-finished") === "true") {
                 listEle.innerHTML = ""
                 grammarEle.innerHTML = ""
-                noteEle.innerHTML = eval(`page.text.endText.${LANG}`)
+                noteEle.innerHTML = eval(`page.text.${LANG}.endText`)
                 listEle.setAttribute("data-list-name", "none")
                 page.inputEle.copy("display")
             }
@@ -133,37 +121,45 @@ const page = {
         load: function (listName) {
             if (listEle.getAttribute("data-list-name") !== `${listName}`) {
                 function displayListImage(i, listName, dataName) {
-                    if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === undefined || eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === "" || eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === "none") {
+                    if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === undefined || eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === "") {
                         return ""
                     } else {
                         return `<div class="mdui-list-item-avatar"><img src="${eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`)}"/></div>`
                     }
                 }
-                function displayListAddFunction(i, listName, dataName) {
-                    if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].add`) !== undefined) {
+                function displayListOnclick(i, listName, dataName) {
+                    var input = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].input`) || eval(`page.json.${dataName}.${LANG}.list.${listName}[0].template.input`)
+                    var auto_next_list = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].auto_next_list`) || eval(`page.json.${dataName}.${LANG}.list.${listName}[0].template.auto_next_list`) 
+                    if (input !== undefined || auto_next_list !== undefined) {
                         var output = {
-                            text: "",
-                            isWithoutReload: ""
+                            input: {
+                                replace: "",
+                                text: ""
+                            },
+                            auto_next_list: ""
                         }
-                        var rule = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].add.rule`)
-                        var text = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].add.text`)
-                        if (text === "none" || text === undefined) {
-                            output.text = ""
-                        } else if (text === "name") {
-                            output.text = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)
-                        } else if (text === "info") {
-                            output.text = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)
-                        }
-                        for (var i = 0; i < rule.length; i++) {
-                            if (rule[i] === "replace_all") {
-                                output.isReplaceAll = true
-                            } else if (rule[i] === "with_space_after") {
-                                output.text += " "
+                        if (input !== undefined) {
+                            var replace = input.replace
+                            var text = input.text
+                            if (replace !== undefined) {
+                                output.input.replace = `, '${replace}'`
                             }
+                            if (text !== undefined) {
+                                output.input.text = text.replace(/{name}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`))
+                                output.input.text = output.input.text.replace(/{info}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`))
+                            }
+                            output.input = `page.inputEle.input('${output.input.text}'${output.input.replace})`
+                        } else {
+                            output.input = ""
                         }
-                        return `page.inputEle.add('${output.text}', ${output.isReplaceAll})`
+                        if (auto_next_list !== undefined) {
+                            
+                        } else {
+                            output.auto_next_list = "; page.change()"
+                        }
+                        return ` onclick="${output.input}${output.auto_next_list}"`
                     } else {
-                        return "page.inputEle.add('',)"
+                        return ""
                     }
                 }
                 function displayListName(i, listName, dataName) {
@@ -181,31 +177,16 @@ const page = {
                     }
                 }
                 function displayListURL(i, listName, dataName) {
-                    if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url`) !== undefined) {
-                        var output
-                        this.page = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url.page`)
-                        this.text = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url.text`)
-                        if (this.page === "none" || this.page === "" || this.page === undefined) {
-                            return ""
-                        } else if (this.page === "command_page") {
-                            output = eval(`page.text.url.command_page.${LANG}`)
-                        } else if (this.page === "normal_page") {
-                            output = eval(`page.text.url.normal_page.${LANG}`)
-                        }  else if (this.page === "search_page") {
-                            output = eval(`page.text.url.search_page.${LANG}`)
-                        } else if (this.page === "custom") {
-                            return `<a class="mdui-btn mdui-btn-icon mdui-list-item-display-when-hover" href="${this.text}" target="_blank" id="listURL"><i class="mdui-icon material-icons mdui-text-color-black-icon">send</i></a>`
-                        }
-                        if (this.text === "none" || this.text === undefined) {
-                            output += ""
-                        } else if (this.text === "name") {
-                            output += eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)
-                        } else if (this.text === "info") {
-                            output += eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)
-                        }
-                        return `<a class="mdui-btn mdui-btn-icon mdui-list-item-display-when-hover" href="${output}" target="_blank" id="listURL"><i class="mdui-icon material-icons mdui-text-color-black-icon">send</i></a>`
-                    } else {
+                    var url = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url`) || eval(`page.json.${dataName}.${LANG}.list.${listName}[0].template.url`)
+                    if (url === undefined || url === "") {
                         return ""
+                    } else {
+                        var output = url.replace(/{name}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`))
+                        output = output.replace(/{info}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`))
+                        output = output.replace(/{command_page}/g, eval(`page.text.${LANG}.url.command_page`))
+                        output = output.replace(/{normal_page}/g, eval(`page.text.${LANG}.url.normal_page`))
+                        output = output.replace(/{search_page}/g, eval(`page.text.${LANG}.url.search_page`))
+                        return `<a class="mdui-btn mdui-btn-icon mdui-list-item-display-when-hover" href="${output}" target="_blank" id="listURL"><i class="mdui-icon material-icons mdui-text-color-black-icon">send</i></a>`
                     }
                 }
                 if (eval(`page.json.main.${LANG}`) !== undefined) {
@@ -213,11 +194,11 @@ const page = {
                         if (eval(`page.json.main.${LANG}.list.${listName}`) !== undefined) {
                             listEle.innerHTML = ""
                             listEle.setAttribute("data-list-name", `${listName}`)
-                            for (var i = 0; i < eval(`page.json.main.${LANG}.list.${listName}.length`); i++) {
+                            for (var i = 1; i < eval(`page.json.main.${LANG}.list.${listName}.length`); i++) {
                                 listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}">
                     ${displayListImage(i, listName, "main")}
-                    <div class="mdui-list-item-content" onclick="${displayListAddFunction(i, listName, "main")}; page.change()">
+                    <div class="mdui-list-item-content"${displayListOnclick(i, listName, "main")}>
                         <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "main")}</div>
                         <div class="mdui-list-item-text mdui-list-item-one-line" id="listInfo">${displayListInfo(i, listName, "main")}</div>
                     </div>
@@ -230,11 +211,11 @@ const page = {
                 if (eval(`page.json.custom.${LANG}`) !== undefined) {
                     if (eval(`page.json.custom.${LANG}.list`) !== undefined) {
                         if (eval(`page.json.custom.${LANG}.list.${listName}`) !== undefined) {
-                            for (var i = 0; i < eval(`page.json.custom.${LANG}.list.${listName}.length`); i++) {
+                            for (var i = 1; i < eval(`page.json.custom.${LANG}.list.${listName}.length`); i++) {
                                 listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}">
                     ${displayListImage(i, listName, "custom")}
-                    <div class="mdui-list-item-content" onclick="${displayListAddFunction(i, listName, "custom")}; page.change()">
+                    <div class="mdui-list-item-content"${displayListOnclick(i, listName, "custom")}>
                         <div class="mdui-list-item-title" id="listName">${displayListName(i, listName, "custom")}</div>
                         <div class="mdui-list-item-text mdui-list-item-one-line" id="listInfo">${displayListInfo(i, listName, "custom")}</div>
                     </div>
@@ -250,6 +231,7 @@ const page = {
         },
         search: function () {
             var theLatestParameter = inputEle.value.split(" ")[inputEle.value.split(" ").length - 1]
+            if (/next/g.test(page.inputEle.getCommandName()) === true) return
             var e = 0
             for (var i = 0; i < listEle.querySelectorAll('.mdui-list-item').length; i++) {
                 listEle.querySelectorAll('.mdui-list-item')[i].style.display = "none"
@@ -345,47 +327,61 @@ const page = {
         }
     },
     grammarEle: {
-        load: function () {
+        load: function (commandName = page.inputEle.getCommandName()) {
             grammarEle.innerHTML = ""
             noteEle.innerHTML = ""
-            if (eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.inputEle.getCommandName()}"})`)[0] !== undefined) {
-                grammarEle.innerHTML = `<span id="0" data-grammar-command-length="0" data-grammar-cammand-list="command">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.inputEle.getCommandName()}"})`)[0].name} </span>`
-                noteEle.innerHTML = `<span id="0" style="display: none;">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${page.inputEle.getCommandName()}"})`)[0].info}</span>`
-                this.loadFromJson(`page.json.main.${LANG}.grammar.${page.inputEle.getCommandName()}[0]`)
+            if (eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${commandName}"})`)[0] !== undefined) {
+                grammarEle.innerHTML = `<span id="0" data-grammar-command-length="0" data-grammar-cammand-list="command">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${commandName}"})`)[0].name} </span>`
+                noteEle.innerHTML = `<span id="0" style="display: none;">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${commandName}"})`)[0].info}</span>`
+                this.loadFromJson(`page.json.main.${LANG}.grammar.${commandName}[0]`, commandName)
                 this.display("grammarEle")
                 this.strong()
             } else {
-                grammarEle.innerHTML = `<span>/${page.inputEle.getCommandName()} </span>`
+                grammarEle.innerHTML = `<span>/${commandName} </span>`
                 noteEle.innerHTML = `未知的命令（此命令不存在于 page.json.main.${LANG}.list.command 中）`
             }
         },
-        loadFromJson: function (str, i = 1) {
+        loadFromJson: function (str, commandName, id = 1) {
             var thisGrammarEle = grammarEle.querySelectorAll("span.part")[document.querySelectorAll("span.part").length - 1] || grammarEle
             if (eval(str.split("[", str.split("[").length - 1).join("[")) !== undefined) {
                 if (eval(str.split("[", str.split("[").length - 1).join("[")).length > 1) {
                     for (var e = 0; e < eval(str.split("[", str.split("[").length - 1).join("[")).length; e++) {
                         str = str.split("[", str.split("[").length - 1).join("[") + `[${e}]`
+                        var newEle = document.createElement("SPAN")
+                        newEle.id = id
+                        newEle.classList.add("part")
+                        newEle.classList.add("mdui-hidden")
+                        newEle.style = "font-weight: normal !important;"
+                        newEle.innerHTML = eval(`${str}.text`)
+                        newEle.setAttribute("data-grammar-command-length", eval(`${str}.length`))
+                        newEle.setAttribute("data-grammar-cammand-list", eval(`${str}.list`))
+                        newEle.setAttribute("data-grammar-judge", eval(`${str}.judge`))
                         if (eval(`${str}.exhaustive`) === "true") {
-                            thisGrammarEle.innerHTML += `<span id="${i}" data-grammar-command-length="${eval(`${str}.length`)}" data-grammar-cammand-list="${eval(`${str}.list`)}" data-grammar-cammand-exhaustive="true" data-grammar-judge="${eval(`${str}.judge`)}" class="part mdui-hidden" style="font-weight: normal !important;">${eval(`${str}.text`)} </span>`
-                        } else {
-                            thisGrammarEle.innerHTML += `<span id="${i}" data-grammar-command-length="${eval(`${str}.length`)}" data-grammar-cammand-list="${eval(`${str}.list`)}" data-grammar-judge="${eval(`${str}.judge`)}" class="part mdui-hidden" style="font-weight: normal !important;">${eval(`${str}.text`)} </span>`
+                            newEle.setAttribute("data-grammar-cammand-exhaustive", "true")
                         }
-                        noteEle.innerHTML += `<span id="${i}" style="display: none;">${eval(`${str}.note`)}</span>`
-                        i++
-                        this.loadFromJson(`${str}.next[0]`, i)
+                        thisGrammarEle.appendChild(newEle)
+                        noteEle.innerHTML += `<span id="${id}" style="display: none;">${eval(`${str}.note`)}</span>`
+                        id++
+                        this.loadFromJson(`${str}.next[0]`, commandName, id)
                     }
                 } else if (eval(str) !== "End") {
+                    var newEle = document.createElement("SPAN")
+                    newEle.id = id
+                    newEle.classList.add("mdui-hidden")
+                    newEle.style = "font-weight: normal !important;"
+                    newEle.innerHTML = eval(`${str}.text`)
+                    newEle.setAttribute("data-grammar-command-length", eval(`${str}.length`))
+                    newEle.setAttribute("data-grammar-cammand-list", eval(`${str}.list`))
                     if (eval(`${str}.exhaustive`) === "true") {
-                            thisGrammarEle.innerHTML += `<span id="${i}" data-grammar-command-length="${eval(`${str}.length`)}" data-grammar-cammand-list="${eval(`${str}.list`)}" data-grammar-cammand-exhaustive="true" class="mdui-hidden" style="font-weight: normal !important;">${eval(`${str}.text`)} </span>`
-                        } else {
-                            thisGrammarEle.innerHTML += `<span id="${i}" data-grammar-command-length="${eval(`${str}.length`)}" data-grammar-cammand-list="${eval(`${str}.list`)}" class="mdui-hidden" style="font-weight: normal !important;">${eval(`${str}.text`)} </span>`
-                        }
-                    noteEle.innerHTML += `<span id="${i}" style="display: none;">${eval(`${str}.note`)}</span>`
-                    i++
-                    this.loadFromJson(`${str}.next[0]`, i)
+                        newEle.setAttribute("data-grammar-cammand-exhaustive", "true")
+                    }
+                    thisGrammarEle.appendChild(newEle)
+                    noteEle.innerHTML += `<span id="${id}" style="display: none;">${eval(`${str}.note`)}</span>`
+                    id++
+                    this.loadFromJson(`${str}.next[0]`, commandName, id)
                 }
             } else {
-                grammarEle.innerHTML = `<span>${page.inputEle.getCommandName()}</span>`
+                grammarEle.innerHTML = `<span>/${commandName} </span>`
                 noteEle.innerHTML = `未知的命令（此命令不存在于 page.json.main.${LANG}.grammar 中）`
             }
         },

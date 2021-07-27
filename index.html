@@ -11,16 +11,36 @@
         <!--CSS-->
         <link rel="stylesheet" href="./css/index.css"/>
         <!--MDUI CSS-->
-        <link rel="stylesheet" href="./mdui/css/mdui.min.css"/>
+        <link rel="stylesheet" href="./dependencies/mdui/css/mdui.min.css"/>
         <link rel="stylesheet" href="./css/mdui.extension.css"/>
+        <!--Eruda.js-->
+        <script>
+            /**
+             * 移动端开发者工具（eruda）：默认关闭
+             * Mobile Devtools(eruda): default off
+             * 
+             * https://github.com/liriliri/eruda
+             */
+            if (localStorage.getItem("eruda") === null) {
+                localStorage.setItem("eruda", "false")
+            }
+            if (localStorage.getItem("eruda") === "true") {
+                var script = document.createElement("script")
+                script.src = "./dependencies/eruda/eruda.min.js"
+                document.head.appendChild(script)
+                script.onload = function () {
+                    eruda.init()
+                }
+            }
+        </script>
     </head>
-    <body class="mdui-theme-primary-indigo mdui-theme-accent-pink" style="padding-top: 120px;">
+    <body class="thin-model mdui-theme-primary-indigo mdui-theme-accent-pink" style="padding-top: 120px;">
         <!--应用栏-->
         <div class="mdui-appbar mdui-appbar-fixed">
             <div class="mdui-toolbar mdui-color-theme" style="height: 60px;">
                 <i style="width: 32px !important;" class="mdui-icon material-icons mdui-text-color-white-icon mdui-m-r-0">edit</i>
                 <div class="mdui-textfield mdui-textfield-white" style="padding: 18px 0; width: 100%">
-                    <input style="height: 24px; width: 100%; padding-bottom: 4px" class="mdui-textfield-input mdui-text-color-white-text mdui-p-t-0" type="text" placeholder="开始编写" id="edit" oninput="page.change(); page.listEle.search()"/>
+                    <input style="height: 24px; width: 100%; padding-bottom: 4px" class="mdui-textfield-input mdui-text-color-white-text mdui-p-t-0" type="text" id="edit"/>
                 </div>
             </div>
             <div class="mdui-toolbar mdui-color-white" style="height: 60px;">
@@ -93,7 +113,7 @@
                 </div>
             </div>
             <div class="mdui-dialog-actions">
-                <button class="mdui-btn mdui-ripple" onclick="page.custom.setCustomURL()">保存</button>
+                <button class="mdui-btn mdui-ripple" onclick="page.custom.setURL()">保存</button>
                 <button class="mdui-btn mdui-ripple" mdui-dialog-close>关闭</button>
             </div>
         </div>
@@ -227,31 +247,8 @@
             <ul class="mdui-list mdui-p-t-0" id="list"></ul>
         </div>
         <!--MDUI JS-->
-        <script src="./mdui/js/mdui.min.js"></script>
+        <script src="./dependencies/mdui/js/mdui.min.js"></script>
         <!--JavaScript-->
-        <script>
-            /**
-             * 移动端开发者工具（eruda）：默认关闭
-             * Mobile Devtools(eruda): default off
-             * 
-             * https://github.com/liriliri/eruda
-             */
-            if (localStorage.getItem("eruda") === null) {
-                localStorage.setItem("eruda", "false")
-            }
-            if (localStorage.getItem("eruda") === "true") {
-                var comment = document.createComment("Eruda.js")
-                document.body.appendChild(comment)
-                var script = document.createElement("script")
-                script.src = "./eruda/eruda.min.js"
-                document.body.appendChild(script)
-                script.onload = function () {
-                    eruda.init()
-                }
-            }
-        </script>
-        <script src="./js/index.js"></script>
-        <script src="./js/json/main/main.zh.json.js"></script>
         <script>
             /**
              * 默认语言：简体中文
@@ -260,7 +257,6 @@
             if (localStorage.getItem("language") === null) {
                 localStorage.setItem("language", "zh")
             }
-            page.setting.language.setFromStorage()
             /** 
              * 默认主题色：{primary: "indigo", accent: "pink"}
              * Default Theme Color: {primary: "indigo", accent: "pink"}
@@ -272,7 +268,6 @@
             if (localStorage.getItem("mduiThemeColor") === null) {
                 localStorage.setItem("mduiThemeColor", '{primary: "indigo", accent: "pink"}')
             }
-            page.setting.mduiThemeColor.setFromStorage()
             /** 
              * 默认自定义链接：""(空)
              * Default Custom URL: ""(none)
@@ -280,7 +275,16 @@
             if (localStorage.getItem("customURL") === null) {
                 localStorage.setItem("customURL", "")
             }
+        </script>
+        <script src="./js/index.js"></script>
+        <script type="module" src="./js/load-json.js"></script>
+        <script>
+            page.setting.language.setFromStorage()
+            page.setting.mduiThemeColor.setFromStorage()
             page.custom.setURLFromStorage()
+            window.onload = () => {
+                page.initialization()
+            }
         </script>
     </body>
 </html>
