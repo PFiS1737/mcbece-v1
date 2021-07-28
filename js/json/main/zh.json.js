@@ -1,5 +1,6 @@
 export var json = {
     "list": {
+    	"block": [],
         "next": [
             {
                 "template": {}
