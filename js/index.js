@@ -123,7 +123,7 @@ const page = {
             if (listEle.getAttribute("data-list-name") !== listName) {
                 listEle.innerHTML = ""
                 for (var i = 0; i < listName.split(",").length; i++) {
-                    this.loadFromJson(listName.split(",")[i]) // 写json时，编辑语法中每一项的"list"的值时，使用","分割可以同时加载多个列表，但","后建议加空格，即", "，具体原因见项目文档
+                    this.loadFromJson(listName.split(",")[i].replace(" ", ""))
                 }
                 this.getListName("display")
                 this.exhaustive.judge()

@@ -14,7 +14,7 @@
 
 ### Json 结构
 
-```js
+```javascript
 // custom.js
 {
     "language": {
@@ -41,7 +41,7 @@
 
 ### Json 结构
 
-```js
+```javascript
 "list_name": [
     {
         "name": "",
@@ -79,7 +79,7 @@
 - `list_name`
     - 列表的名词，调用时需输入该列表相对"list"的位置
     - 例：有两个个列表为
-```js
+```javascript
 "list": {
     "block": [
         ...
@@ -92,22 +92,23 @@
 }
 ```
     - 那么，它应该为`block`和`coordinate.x`
+    - **必填，否则会出现 JSON 语法错误**
 - `list_name[0]`
     - 每个列表的第一项为配置项，不会加载进网页
-    - 必填，否则会报错
+    - **必填，否则会报错**
     - `name`、`version`和`minecraft_version`
         - 列表的名称、版本和对于的游戏版本，基本没用，仅用做注释
         - `name`与`list_name`无关
     - `template`
         - 模板
-        - 必填，否则会报错
+        - **必填，否则会报错**
         - 可以有`template.url`、`template.input`和`auto_next_list`
 - `image`
     - 列表项图片
 
 - `name`
     - 列表项的名称
-    - 必填，否则会报错，但可以为`""`
+    - **必填，否则会报错，但可以为`""`**
 - `info`
     - 列表项的信息
     - 若`name`的值为`""`，它会垂直居中整个列表项
@@ -130,10 +131,7 @@
     - 规定自动切换的下一个列表
     - 使用后点击列表将不再触发`page.chang()`而是以`page.listEle.load('...')`代替
     - 它的内容应该为一个或多个列表名称，例如上文中的`block`和`coordinate.x`
-    - 多个列表需用逗号隔开，逗号后需空格，即`, `，否则可能出现加载不全的问题（不会报错），详见下文详解
     - 它可以写在`template`中
-
-### 详解
 
 
 
