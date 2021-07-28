@@ -21,10 +21,10 @@
              * 
              * https://github.com/liriliri/eruda
              */
-            if (localStorage.getItem("eruda") === null) {
-                localStorage.setItem("eruda", "false")
+            if (localStorage.getItem("devTool") === null) {
+                localStorage.setItem("devTool", "false")
             }
-            if (localStorage.getItem("eruda") === "true") {
+            if (localStorage.getItem("devTool") === "true") {
                 var script = document.createElement("script")
                 script.src = "./dependencies/eruda/eruda.min.js"
                 document.head.appendChild(script)
@@ -102,9 +102,7 @@
                         <div class="mdui-typo-title">语言 | Language</div>
                     </div>
                     <div class="mdui-col-xs-1 mdui-p-b-1" style="width: 30px;"></div>
-                    <div class="mdui-col-xs-11 mdui-p-b-1" id="setLanguage">
-                        
-                    </div>
+                    <div class="mdui-col-xs-11 mdui-p-b-1" id="setLanguage"></div>
                     <div class="mdui-col-xs-12 mdui-p-b-1">
                         <div class="mdui-typo-title">主题 | Theme</div>
                     </div>
@@ -134,7 +132,7 @@
                             每行只能输入<strong>一个</strong>链接<br />
                             请确保每条 JavaScript 链接都以 ".js" 结尾<br />
                             网站会自动识别以 "/custom.json" 结尾的链接，并使用其中的内容<br />
-                            你可以点击<a target="_blank" href="./js/custom/demo/custom.json">这里</a>查看 "custom.json" 的示例文件<br />
+                            你可以点击<a target="_blank" href="./js/json/custom/demo.json">这里</a>查看 "custom.json" 的示例文件<br />
                             点击保存后会<strong>刷新页面</strong><br />
                             您添加的所有信息都将保存在 localStorage 中
                         </span>
@@ -278,13 +276,5 @@
         </script>
         <script src="./js/index.js"></script>
         <script type="module" src="./js/load-json.js"></script>
-        <script>
-            page.setting.language.setFromStorage()
-            page.setting.mduiThemeColor.setFromStorage()
-            page.custom.setURLFromStorage()
-            window.onload = () => {
-                page.initialization()
-            }
-        </script>
     </body>
 </html>
