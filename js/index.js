@@ -118,28 +118,40 @@ const page = {
                 return listName
             }
         },
-        load: function (listName, i = 0) {
+        load: function (listName , i = 0) {
+            console.log({listName})
+            if (listEle.getAttribute("data-list-name") !== listName) {
+                listEle.innerHTML = ""
+                for (var i = 0; i < listName.split(",").length; i++) {
+                    this.loadFromJson(listName.split(",")[i]) // 写json时，编辑语法中每一项的"list"的值时，使用","分割可以同时加载多个列表，但","后建议加空格，即", "，具体原因见项目文档
+                }
+                this.getListName("display")
+                this.exhaustive.judge()
+            }
+        },
+        loadFromJson: function (listName, i = 0) {
+            listEle.setAttribute("data-list-name", listName)
             if (listName === "selector") {
                 var selector = page.inputEle.getParameterByLength("theLatest")
                 if (selector.split("").length <= 1) {
-                    this.load("selector.parameter")
+                    this.loadFromJson("selector.parameter")
                 } else if (selector.split("").length === 2 && /@/g.test(selector) === true) {
-                    this.load("selector.next")
+                    this.loadFromJson("selector.next")
                 } else if (selector.split("").length > 2) {
                     var variable_item = selector.split("[")[1].split("]")[0].split(",")[selector.split("[")[1].split("]")[0].split(",").length - 1]
                     var key = variable_item.split("=")[0]
                     var value = variable_item.split("=")[1]
                     if (key !== undefined && key !== "" && value !== undefined && value !== "") {
-                        this.load("selector.next_variable")
+                        this.loadFromJson("selector.next_variable")
                     } else if (key !== undefined && key !== "" && value === "") {
                         var arr = new Array
                         if (eval(`page.json.main.${LANG}.list.selector.variable.filter(function(item){return item.name === "${key}"})`)[0] !== undefined) {
                             eval(`page.json.main.${LANG}.list.selector.variable.filter(function(item, index){return item.name === "${key}" && arr.push(index)})`)
                             listName = `selector.variable[${arr[0]}].value`
                         }
-                        this.load(listName)
+                        this.loadFromJson(listName)
                     } else if ((key === "" && value === undefined) || (key !== undefined && key !== "" && value === undefined)) {
-                        this.load("selector.variable")
+                        this.loadFromJson("selector.variable")
                     }
                 }
                 return
@@ -147,100 +159,92 @@ const page = {
                 var coordinate = page.inputEle.getParameterByLength("theLatest")
                 var coordinate_axis = grammarEle.querySelectorAll("span:not(.mdui-hidden)")[inputEle.value.split(" ").length - 1].getAttribute("data-grammar-coordinate-axis")
                 if (coordinate.split("").length < 1) {
-                    this.load(`coordinate.${coordinate_axis}`, 1)
+                    this.loadFromJson(`coordinate.${coordinate_axis}`, 1)
                 } else if (coordinate.split("").length === 1 && (coordinate.split("")[0] === "~" || coordinate.split("")[0] === "^")) {
-                    this.load(`coordinate.${coordinate_axis}[0].value`)
+                    this.loadFromJson(`coordinate.${coordinate_axis}[0].value`)
                 } else if (coordinate.split("").length >= 1) {
-                    this.load("next")
+                    this.loadFromJson("next")
                 }
                 return
             } else if ((listName === "coordinate.x" || listName === "coordinate.y" || listName === "coordinate.z") && i === 0) {
                 var coordinate = page.inputEle.getParameterByLength("theLatest")
                 var coordinate_axis = listName.split(".")[1]
                 if (coordinate.split("").length === 1 && (coordinate.split("")[0] === "~" || coordinate.split("")[0] === "^")) {
-                    this.load(`coordinate.${coordinate_axis}[0].value`)
+                    this.loadFromJson(`coordinate.${coordinate_axis}[0].value`)
                 } else if (coordinate.split("").length >= 1) {
-                    this.load("next")
+                    this.loadFromJson("next")
                 }
                 return
             }
-            console.log(listName)
-            if (listEle.getAttribute("data-list-name") !== `${listName}`) {
-                function displayListImage(i, listName, dataName) {
-                    if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === undefined || eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === "") {
-                        return ""
-                    } else {
-                        return `<div class="mdui-list-item-avatar"><img src="${eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`)}"/></div>`
-                    }
+            function displayListImage(i, listName, dataName) {
+                if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === undefined || eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === "") {
+                    return ""
+                } else {
+                    return `<div class="mdui-list-item-avatar"><img src="${eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`)}"/></div>`
                 }
-                function displayListOnclick(i, listName, dataName) {
-                    var input = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].input`) || eval(`page.json.${dataName}.${LANG}.list.${listName}[0].template.input`)
-                    var auto_next_list = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].auto_next_list`) || eval(`page.json.${dataName}.${LANG}.list.${listName}[0].template.auto_next_list`) 
-                    if (input !== undefined || auto_next_list !== undefined) {
-                        var output = {
-                            input: {
-                                replace: "",
-                                text: ""
-                            },
-                            auto_next_list: ""
+            }
+            function displayListOnclick(i, listName, dataName) {
+                var input = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].input`) || eval(`page.json.${dataName}.${LANG}.list.${listName}[0].template.input`)
+                var auto_next_list = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].auto_next_list`) || eval(`page.json.${dataName}.${LANG}.list.${listName}[0].template.auto_next_list`) 
+                if (input !== undefined || auto_next_list !== undefined) {
+                    var output = {
+                        input: {
+                            replace: "",
+                            text: ""
+                        },
+                        auto_next_list: ""
+                    }
+                    if (input !== undefined) {
+                        var replace = input.replace
+                        var text = input.text
+                        if (replace !== undefined) {
+                            output.input.replace = `, '${replace}'`
                         }
-                        if (input !== undefined) {
-                            var replace = input.replace
-                            var text = input.text
-                            if (replace !== undefined) {
-                                output.input.replace = `, '${replace}'`
-                            }
-                            if (text !== undefined) {
-                                output.input.text = text.replace(/{name}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)).replace(/{info}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`))
-                            }
-                            output.input = `page.inputEle.input('${output.input.text}'${output.input.replace})`
-                        } else {
-                            output.input = ""
+                        if (text !== undefined) {
+                            output.input.text = text.replace(/{name}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)).replace(/{info}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`))
                         }
-                        if (auto_next_list !== undefined) {
-                            output.auto_next_list = `; page.listEle.load('${auto_next_list}')`
-                        } else {
-                            output.auto_next_list = "; page.change()"
-                        }
-                        return ` onclick="${output.input}${output.auto_next_list}"`
+                        output.input = `page.inputEle.input('${output.input.text}'${output.input.replace})`
                     } else {
-                        return ""
+                        output.input = ""
                     }
-                }
-                function displayListName(i, listName, dataName) {
-                    if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`) === undefined) {
-                        console.error(`列表 ${listName} 中，第 ${i} 项的“name” 是必须的。`)
+                    if (auto_next_list !== undefined) {
+                        output.auto_next_list = `; page.listEle.load('${auto_next_list}')`
                     } else {
-                        return eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)
+                        output.auto_next_list = "; page.change()"
                     }
+                    return ` onclick="${output.input}${output.auto_next_list}"`
+                } else {
+                    return ""
                 }
-                function displayListInfo(i, listName, dataName) {
-                    if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`) === undefined) {
-                        return ""
-                    } else {
-                        return eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)
-                    }
+            }
+            function displayListName(i, listName, dataName) {
+                if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`) === undefined) {
+                    console.error(`列表 ${listName} 中，第 ${i} 项的“name” 是必须的。`)
+                } else {
+                    return eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)
                 }
-                function displayListURL(i, listName, dataName) {
-                    var url = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url`) || eval(`page.json.${dataName}.${LANG}.list.${listName}[0].template.url`)
-                    if (url === undefined || url === "") {
-                        return ""
-                    } else {
-                        var output = url.replace(/{name}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`))
-                            .replace(/{info}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`))
-                            .replace(/{command_page}/g, eval(`page.text.${LANG}.url.command_page`))
-                            .replace(/{normal_page}/g, eval(`page.text.${LANG}.url.normal_page`))
-                            .replace(/{search_page}/g, eval(`page.text.${LANG}.url.search_page`))
-                        return `<a class="mdui-btn mdui-btn-icon mdui-list-item-display-when-hover" href="${output}" target="_blank" id="listURL"><i class="mdui-icon material-icons mdui-text-color-black-icon">send</i></a>`
-                    }
+            }
+            function displayListInfo(i, listName, dataName) {
+                if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`) === undefined) {
+                    return ""
+                } else {
+                    return eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)
                 }
-                if (eval(`page.json.main.${LANG}`) !== undefined) {
-                    if (eval(`page.json.main.${LANG}.list`) !== undefined) {
-                        if (eval(`page.json.main.${LANG}.list.${listName}`) !== undefined) {
-                            listEle.innerHTML = ""
-                            listEle.setAttribute("data-list-name", `${listName}`)
-                            for (var i = 1; i < eval(`page.json.main.${LANG}.list.${listName}.length`); i++) {
-                                listEle.innerHTML += `
+            }
+            function displayListURL(i, listName, dataName) {
+                var url = eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].url`) || eval(`page.json.${dataName}.${LANG}.list.${listName}[0].template.url`)
+                if (url === undefined || url === "") {
+                    return ""
+                } else {
+                    var output = url.replace(/{name}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)).replace(/{info}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)).replace(/{command_page}/g, eval(`page.text.${LANG}.url.command_page`)).replace(/{normal_page}/g, eval(`page.text.${LANG}.url.normal_page`)).replace(/{search_page}/g, eval(`page.text.${LANG}.url.search_page`))
+                    return `<a class="mdui-btn mdui-btn-icon mdui-list-item-display-when-hover" href="${output}" target="_blank" id="listURL"><i class="mdui-icon material-icons mdui-text-color-black-icon">send</i></a>`
+                }
+            }
+            if (eval(`page.json.main.${LANG}`) !== undefined) {
+                if (eval(`page.json.main.${LANG}.list`) !== undefined) {
+                    if (eval(`page.json.main.${LANG}.list.${listName}`) !== undefined) {
+                        for (var i = 1; i < eval(`page.json.main.${LANG}.list.${listName}.length`); i++) {
+                            listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}">
                     ${displayListImage(i, listName, "main")}
                     <div class="mdui-list-item-content"${displayListOnclick(i, listName, "main")}>
@@ -249,15 +253,15 @@ const page = {
                     </div>
                     ${displayListURL(i, listName, "main")}
                 </li>`
-                            }
                         }
                     }
                 }
-                if (eval(`page.json.custom.${LANG}`) !== undefined) {
-                    if (eval(`page.json.custom.${LANG}.list`) !== undefined) {
-                        if (eval(`page.json.custom.${LANG}.list.${listName}`) !== undefined) {
-                            for (var i = 1; i < eval(`page.json.custom.${LANG}.list.${listName}.length`); i++) {
-                                listEle.innerHTML += `
+            }
+            if (eval(`page.json.custom.${LANG}`) !== undefined) {
+                if (eval(`page.json.custom.${LANG}.list`) !== undefined) {
+                    if (eval(`page.json.custom.${LANG}.list.${listName}`) !== undefined) {
+                        for (var i = 1; i < eval(`page.json.custom.${LANG}.list.${listName}.length`); i++) {
+                            listEle.innerHTML += `
                 <li class="mdui-list-item mdui-ripple" id="${i}">
                     ${displayListImage(i, listName, "custom")}
                     <div class="mdui-list-item-content"${displayListOnclick(i, listName, "custom")}>
@@ -266,12 +270,9 @@ const page = {
                     </div>
                     ${displayListURL(i, listName, "custom")}
                 </li>`
-                            }
                         }
                     }
                 }
-                this.getListName("display")
-                this.exhaustive.judge()
             }
         },
         search: function () {
@@ -408,7 +409,9 @@ const page = {
                         if (eval(`${str}.list`) === "coordinate") {
                             // text = text.replace("x y z", `x <span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden">y</span> <span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" data-grammar-judge="${eval(`${str}.judge`)}" class="part mdui-hidden">z</span>`)
                             // text = `<span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" data-grammar-judge="${eval(`${str}.judge`)}" class="part mdui-hidden">${text}</span></span>`
-                            text = `<span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" class="mdui-hidden">${text}</span></span>`
+                               text = `<span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" class="mdui-hidden">${text}</span></span>`
+                            // text = `<span id="${id}" data-grammar-command-list="coordinate.y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="coordinate.z" data-grammar-command-length="${eval(`${str}.length`) + 2}" class="mdui-hidden">${text}</span></span>`
+                            // newEle.setAttribute("data-grammar-command-list", "coordinate.x")
                             // newEle.classList.remove("part")
                             // newEle.removeAttribute("data-grammar-judge")
                             newEle.setAttribute("data-grammar-coordinate-axis", "x")
@@ -432,7 +435,9 @@ const page = {
                     }
                     if (eval(`${str}.list`) === "coordinate") {
                         //text = text.replace("x y z", `x <span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}">y</span> <span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}">z</span>`)
-                        text = `<span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" class="mdui-hidden">${text}</span></span>`
+                        // text = `<span id="${id}" data-grammar-command-list="coordinate.y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="coordinate.z" data-grammar-command-length="${eval(`${str}.length`) + 2}" class="mdui-hidden">${text}</span></span>`
+                        text = `<span id="${id}" data-grammar-command-list="coordinate" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="coordinate" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" class="mdui-hidden">${text}</span></span>`
+                        // newEle.setAttribute("data-grammar-command-list", "coordinate.x")
                         newEle.setAttribute("data-grammar-coordinate-axis", "x")
                     }
                     newEle.innerHTML = text
@@ -525,14 +530,15 @@ const page = {
     },
     setting: {
         developer: {
-            eruda: {
+            devTool: {
                 set: function (value) {
                     if (value === "true" || value === "false") {
-                        localStorage.setItem("eruda", value)
+                        localStorage.setItem("devTool", value)
                     }
+                    location.reload()
                 },
                 get: function () {
-                    return localStorage.getItem("eruda")
+                    return localStorage.getItem("devTool")
                 }
             }
         },
@@ -583,8 +589,15 @@ const page = {
     }
 }
 
+page.setting.language.setFromStorage()
+page.setting.mduiThemeColor.setFromStorage()
+page.custom.setURLFromStorage()
+window.onload = () => {
+    page.initialization()
+}
 
 
+/*
 
 function exhaustive(request) {
     
@@ -613,4 +626,4 @@ function exhaustive(request) {
         }
         return output
     }
-}
+}*/

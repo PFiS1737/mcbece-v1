@@ -17,67 +17,97 @@ export var json = {
             "x": [
                 {
                     "template": {},
-                    "value": []
+                    "value": [
+                        {
+                            "template": {}
+                        },
+                        {
+                            "name": "",
+                            "info": "下一项",
+                            "input": {
+                                "replace": "none",
+                                "text": " "
+                            }
+                        }
+                    ]
                 },
                 {
                     "name": "~",
                     "info": "相对坐标",
                     "input": {
                         "text": "{name}"
-                    },
-                    "value": []
+                    }
                 },
                 {
                     "name": "^",
                     "info": "局部坐标",
                     "input": {
                         "text": "{name}"
-                    },
-                    "value": []
+                    }
                 }
             ],
             "y": [
                 {
                     "template": {},
-                    "value": []
+                    "value": [
+                        {
+                            "template": {}
+                        },
+                        {
+                            "name": "",
+                            "info": "下一项",
+                            "input": {
+                                "replace": "none",
+                                "text": " "
+                            }
+                        }
+                    ]
                 },
                 {
                     "name": "~",
                     "info": "相对坐标",
                     "input": {
                         "text": "{name}"
-                    },
-                    "value": []
+                    }
                 },
                 {
                     "name": "^",
                     "info": "局部坐标",
                     "input": {
                         "text": "{name}"
-                    },
-                    "value": []
+                    }
                 }
             ],
             "z": [
                 {
                     "template": {},
-                    "value": []
+                    "value": [
+                        {
+                            "template": {}
+                        },
+                        {
+                            "name": "",
+                            "info": "下一项",
+                            "input": {
+                                "replace": "none",
+                                "text": " "
+                            }
+                        }
+                    ]
                 },
                 {
                     "name": "~",
                     "info": "相对坐标",
                     "input": {
                         "text": "{name}"
-                    },
-                    "value": []
+                    }
                 },
                 {
                     "name": "^",
                     "info": "局部坐标",
                     "input": {
                         "text": "{name}"
-                    },
-                    "value": []
+                    }
                 }
             ]
         },
@@ -100,6 +130,20 @@ export var json = {
                 }
             }
         ],
+        "commands": {
+            "execute": [
+                {
+                    "template": {}
+                },
+                {
+                    "name": "detect",
+                    "info": "[不是命令] 检测方块。",
+                    "input": {
+                        "text": "{name} "
+                    }
+                }
+            ]
+        },
         "command": [
             {
                 "template": {
@@ -450,7 +494,7 @@ export var json = {
                                 "note": "指定要运行的命令。",
                                 "judge": "/ /",
                                 "length": 5,
-                                "list": "executeCommand",
+                                "list": "commands.execute, command",
                                 "next": [
                                     "End"
                                 ]
@@ -460,7 +504,7 @@ export var json = {
                                 "note": "检测方块。",
                                 "judge": "/detect/g",
                                 "length": 5,
-                                "list": "executeCommandWithDetect",
+                                "list": "commands.execute, command",
                                 "next": [
                                     {
                                         "text": "<探测坐标：x y z>",
@@ -472,19 +516,19 @@ export var json = {
                                                 "text": "<方块：方块>",
                                                 "note": "指定要检测的方块ID。",
                                                 "list": "block",
-                                                "length": 7,
+                                                "length": 9,
                                                 "next": [
                                                     {
                                                         "text": "<数据：整数>",
                                                         "note": "指定要检测的方块的数据值。",
-                                                        "list": "blockData",
-                                                        "length": 8,
+                                                        "list": "block.data",
+                                                        "length": 10,
                                                         "next": [
                                                             {
                                                                 "text": "<命令：命令>",
                                                                 "note": "指定要运行的命令。",
-                                                                "list": "executeCommand",
-                                                                "length": 9,
+                                                                "list": "commands.execute, command",
+                                                                "length": 11,
                                                                 "next": [
                                                                     "End"
                                                                 ]
@@ -534,7 +578,7 @@ export var json = {
                     {
                         "text": "[y旋转角度：角度]",
                         "note": "",
-                        "judge": "/[0-9]/g",
+                        "judge": "/~[0-9]/g",
                         "list": "",
                         "length": 4,
                         "next": [
