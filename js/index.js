@@ -5,7 +5,7 @@ const listEle = document.querySelector("#list")
 const wikiEle = document.querySelector("#wiki")
 const copyEle = document.querySelector("#copy")
 
-let LANG = ""
+let LANG
 
 const page = {
     json: {
@@ -30,7 +30,7 @@ const page = {
         if (inputEle.value === "") return
         this.grammarEle.load()
         if (grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1] !== undefined) {
-            this.listEle.load(`${grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1].getAttribute("data-grammar-cammand-list")}`)
+            this.listEle.load(`${grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1].getAttribute("data-grammar-command-list")}`)
         }
         this.edit.finish()
     },
@@ -118,7 +118,53 @@ const page = {
                 return listName
             }
         },
-        load: function (listName) {
+        load: function (listName, i = 0) {
+            if (listName === "selector") {
+                var selector = page.inputEle.getParameterByLength("theLatest")
+                if (selector.split("").length <= 1) {
+                    this.load("selector.parameter")
+                } else if (selector.split("").length === 2 && /@/g.test(selector) === true) {
+                    this.load("selector.next")
+                } else if (selector.split("").length > 2) {
+                    var variable_item = selector.split("[")[1].split("]")[0].split(",")[selector.split("[")[1].split("]")[0].split(",").length - 1]
+                    var key = variable_item.split("=")[0]
+                    var value = variable_item.split("=")[1]
+                    if (key !== undefined && key !== "" && value !== undefined && value !== "") {
+                        this.load("selector.next_variable")
+                    } else if (key !== undefined && key !== "" && value === "") {
+                        var arr = new Array
+                        if (eval(`page.json.main.${LANG}.list.selector.variable.filter(function(item){return item.name === "${key}"})`)[0] !== undefined) {
+                            eval(`page.json.main.${LANG}.list.selector.variable.filter(function(item, index){return item.name === "${key}" && arr.push(index)})`)
+                            listName = `selector.variable[${arr[0]}].value`
+                        }
+                        this.load(listName)
+                    } else if ((key === "" && value === undefined) || (key !== undefined && key !== "" && value === undefined)) {
+                        this.load("selector.variable")
+                    }
+                }
+                return
+            } else if (listName === "coordinate") {
+                var coordinate = page.inputEle.getParameterByLength("theLatest")
+                var coordinate_axis = grammarEle.querySelectorAll("span:not(.mdui-hidden)")[inputEle.value.split(" ").length - 1].getAttribute("data-grammar-coordinate-axis")
+                if (coordinate.split("").length < 1) {
+                    this.load(`coordinate.${coordinate_axis}`, 1)
+                } else if (coordinate.split("").length === 1 && (coordinate.split("")[0] === "~" || coordinate.split("")[0] === "^")) {
+                    this.load(`coordinate.${coordinate_axis}[0].value`)
+                } else if (coordinate.split("").length >= 1) {
+                    this.load("next")
+                }
+                return
+            } else if ((listName === "coordinate.x" || listName === "coordinate.y" || listName === "coordinate.z") && i === 0) {
+                var coordinate = page.inputEle.getParameterByLength("theLatest")
+                var coordinate_axis = listName.split(".")[1]
+                if (coordinate.split("").length === 1 && (coordinate.split("")[0] === "~" || coordinate.split("")[0] === "^")) {
+                    this.load(`coordinate.${coordinate_axis}[0].value`)
+                } else if (coordinate.split("").length >= 1) {
+                    this.load("next")
+                }
+                return
+            }
+            console.log(listName)
             if (listEle.getAttribute("data-list-name") !== `${listName}`) {
                 function displayListImage(i, listName, dataName) {
                     if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === undefined || eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === "") {
@@ -145,15 +191,14 @@ const page = {
                                 output.input.replace = `, '${replace}'`
                             }
                             if (text !== undefined) {
-                                output.input.text = text.replace(/{name}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`))
-                                output.input.text = output.input.text.replace(/{info}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`))
+                                output.input.text = text.replace(/{name}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)).replace(/{info}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`))
                             }
                             output.input = `page.inputEle.input('${output.input.text}'${output.input.replace})`
                         } else {
                             output.input = ""
                         }
                         if (auto_next_list !== undefined) {
-                            
+                            output.auto_next_list = `; page.listEle.load('${auto_next_list}')`
                         } else {
                             output.auto_next_list = "; page.change()"
                         }
@@ -182,10 +227,10 @@ const page = {
                         return ""
                     } else {
                         var output = url.replace(/{name}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`))
-                        output = output.replace(/{info}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`))
-                        output = output.replace(/{command_page}/g, eval(`page.text.${LANG}.url.command_page`))
-                        output = output.replace(/{normal_page}/g, eval(`page.text.${LANG}.url.normal_page`))
-                        output = output.replace(/{search_page}/g, eval(`page.text.${LANG}.url.search_page`))
+                            .replace(/{info}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`))
+                            .replace(/{command_page}/g, eval(`page.text.${LANG}.url.command_page`))
+                            .replace(/{normal_page}/g, eval(`page.text.${LANG}.url.normal_page`))
+                            .replace(/{search_page}/g, eval(`page.text.${LANG}.url.search_page`))
                         return `<a class="mdui-btn mdui-btn-icon mdui-list-item-display-when-hover" href="${output}" target="_blank" id="listURL"><i class="mdui-icon material-icons mdui-text-color-black-icon">send</i></a>`
                     }
                 }
@@ -230,17 +275,18 @@ const page = {
             }
         },
         search: function () {
-            var theLatestParameter = inputEle.value.split(" ")[inputEle.value.split(" ").length - 1]
+            return
+            var text = page.inputEle.getParameterByLength("theLatest")
             if (/next/g.test(page.inputEle.getCommandName()) === true) return
             var e = 0
             for (var i = 0; i < listEle.querySelectorAll('.mdui-list-item').length; i++) {
                 listEle.querySelectorAll('.mdui-list-item')[i].style.display = "none"
-                if (listEle.querySelectorAll('#listName')[i].innerHTML.startsWith(theLatestParameter) == true || eval("/" + theLatestParameter + "/g.test(listEle.querySelectorAll('#listName')[i].innerHTML)") == true) {
+                if (listEle.querySelectorAll('#listName')[i].innerHTML.startsWith(text) == true || eval(`/${text}/g.test(listEle.querySelectorAll('#listName')[i].innerHTML)`) == true) {
                     listEle.querySelectorAll('.mdui-list-item')[i].style.display = ""
                     e++
                 }
                 if (e == 0) {
-                    if (listEle.querySelectorAll('#listInfo')[i].innerHTML.startsWith(theLatestParameter) == true || eval("/" + theLatestParameter + "/g.test(listEle.querySelectorAll('#listInfo')[i].innerHTML)") == true) {
+                    if (listEle.querySelectorAll('#listInfo')[i].innerHTML.startsWith(text) == true || eval(`/${text}/g.test(listEle.querySelectorAll('#listInfo')[i].innerHTML)`) == true) {
                         listEle.querySelectorAll('.mdui-list-item')[i].style.display = ""
                     }
                 }
@@ -252,7 +298,7 @@ const page = {
                 if (grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1] !== undefined) {
                     listEle.setAttribute("data-is-exhaustive", "false")
                     document.querySelector("#Exhaustive-card").style.display = "none"
-                    if (grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1].getAttribute("data-grammar-cammand-exhaustive") === "true") {
+                    if (grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1].getAttribute("data-grammar-command-exhaustive") === "true") {
                         document.querySelector("#Exhaustive-card").style.display = ""
                         listEle.setAttribute("data-is-exhaustive", "true")
                         mdui.snackbar({
@@ -331,7 +377,7 @@ const page = {
             grammarEle.innerHTML = ""
             noteEle.innerHTML = ""
             if (eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${commandName}"})`)[0] !== undefined) {
-                grammarEle.innerHTML = `<span id="0" data-grammar-command-length="0" data-grammar-cammand-list="command">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${commandName}"})`)[0].name} </span>`
+                grammarEle.innerHTML = `<span id="0" data-grammar-command-length="0" data-grammar-command-list="command">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${commandName}"})`)[0].name} </span>`
                 noteEle.innerHTML = `<span id="0" style="display: none;">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${commandName}"})`)[0].info}</span>`
                 this.loadFromJson(`page.json.main.${LANG}.grammar.${commandName}[0]`, commandName)
                 this.display("grammarEle")
@@ -348,17 +394,26 @@ const page = {
                     for (var e = 0; e < eval(str.split("[", str.split("[").length - 1).join("[")).length; e++) {
                         str = str.split("[", str.split("[").length - 1).join("[") + `[${e}]`
                         var newEle = document.createElement("SPAN")
+                        var text = eval(`${str}.text`) + " "
                         newEle.id = id
                         newEle.classList.add("part")
                         newEle.classList.add("mdui-hidden")
                         newEle.style = "font-weight: normal !important;"
-                        newEle.innerHTML = eval(`${str}.text`)
-                        newEle.setAttribute("data-grammar-command-length", eval(`${str}.length`))
-                        newEle.setAttribute("data-grammar-cammand-list", eval(`${str}.list`))
+                        newEle.setAttribute("data-grammar-command-length", `${eval(`${str}.length`)}`)
+                        newEle.setAttribute("data-grammar-command-list", eval(`${str}.list`))
                         newEle.setAttribute("data-grammar-judge", eval(`${str}.judge`))
                         if (eval(`${str}.exhaustive`) === "true") {
-                            newEle.setAttribute("data-grammar-cammand-exhaustive", "true")
+                            newEle.setAttribute("data-grammar-command-exhaustive", "true")
                         }
+                        if (eval(`${str}.list`) === "coordinate") {
+                            // text = text.replace("x y z", `x <span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden">y</span> <span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" data-grammar-judge="${eval(`${str}.judge`)}" class="part mdui-hidden">z</span>`)
+                            // text = `<span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" data-grammar-judge="${eval(`${str}.judge`)}" class="part mdui-hidden">${text}</span></span>`
+                            text = `<span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" class="mdui-hidden">${text}</span></span>`
+                            // newEle.classList.remove("part")
+                            // newEle.removeAttribute("data-grammar-judge")
+                            newEle.setAttribute("data-grammar-coordinate-axis", "x")
+                        }
+                        newEle.innerHTML = text
                         thisGrammarEle.appendChild(newEle)
                         noteEle.innerHTML += `<span id="${id}" style="display: none;">${eval(`${str}.note`)}</span>`
                         id++
@@ -366,15 +421,21 @@ const page = {
                     }
                 } else if (eval(str) !== "End") {
                     var newEle = document.createElement("SPAN")
+                    var text = eval(`${str}.text`) + " "
                     newEle.id = id
                     newEle.classList.add("mdui-hidden")
                     newEle.style = "font-weight: normal !important;"
-                    newEle.innerHTML = eval(`${str}.text`)
-                    newEle.setAttribute("data-grammar-command-length", eval(`${str}.length`))
-                    newEle.setAttribute("data-grammar-cammand-list", eval(`${str}.list`))
+                    newEle.setAttribute("data-grammar-command-length", `${eval(`${str}.length`)}`)
+                    newEle.setAttribute("data-grammar-command-list", eval(`${str}.list`))
                     if (eval(`${str}.exhaustive`) === "true") {
-                        newEle.setAttribute("data-grammar-cammand-exhaustive", "true")
+                        newEle.setAttribute("data-grammar-command-exhaustive", "true")
                     }
+                    if (eval(`${str}.list`) === "coordinate") {
+                        //text = text.replace("x y z", `x <span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}">y</span> <span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}">z</span>`)
+                        text = `<span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" class="mdui-hidden">${text}</span></span>`
+                        newEle.setAttribute("data-grammar-coordinate-axis", "x")
+                    }
+                    newEle.innerHTML = text
                     thisGrammarEle.appendChild(newEle)
                     noteEle.innerHTML += `<span id="${id}" style="display: none;">${eval(`${str}.note`)}</span>`
                     id++

@@ -13,6 +13,74 @@ export var json = {
                 }
             }
         ],
+        "coordinate": {
+            "x": [
+                {
+                    "template": {},
+                    "value": []
+                },
+                {
+                    "name": "~",
+                    "info": "相对坐标",
+                    "input": {
+                        "text": "{name}"
+                    },
+                    "value": []
+                },
+                {
+                    "name": "^",
+                    "info": "局部坐标",
+                    "input": {
+                        "text": "{name}"
+                    },
+                    "value": []
+                }
+            ],
+            "y": [
+                {
+                    "template": {},
+                    "value": []
+                },
+                {
+                    "name": "~",
+                    "info": "相对坐标",
+                    "input": {
+                        "text": "{name}"
+                    },
+                    "value": []
+                },
+                {
+                    "name": "^",
+                    "info": "局部坐标",
+                    "input": {
+                        "text": "{name}"
+                    },
+                    "value": []
+                }
+            ],
+            "z": [
+                {
+                    "template": {},
+                    "value": []
+                },
+                {
+                    "name": "~",
+                    "info": "相对坐标",
+                    "input": {
+                        "text": "{name}"
+                    },
+                    "value": []
+                },
+                {
+                    "name": "^",
+                    "info": "局部坐标",
+                    "input": {
+                        "text": "{name}"
+                    },
+                    "value": []
+                }
+            ]
+        },
         "boolean": [
             {
                 "template": {}
@@ -148,19 +216,19 @@ export var json = {
                     "template": {}
                 },
                 {
-                    "name": "",
-                    "info": "下一项",
-                    "input": {
-                        "replace": "none",
-                        "text": ""
-                    }
-                },
-                {
                     "name": "[",
                     "info": "使用参数",
                     "input": {
                         "replace": "none",
                         "text": "{name}"
+                    }
+                },
+                {
+                    "name": "",
+                    "info": "下一项",
+                    "input": {
+                        "replace": "none",
+                        "text": " "
                     }
                 }
             ],
@@ -347,7 +415,7 @@ export var json = {
                 "text": "[锁定：布尔值]",
                 "note": "指定是否锁定昼夜更替。",
                 "list": "boolean",
-                "length": "1",
+                "length": 1,
                 "next": [
                     "End"
                 ]
@@ -358,7 +426,7 @@ export var json = {
                 "text": "[锁定：布尔值]",
                 "note": "指定是否锁定昼夜更替。",
                 "list": "boolean",
-                "length": "1",
+                "length": 1,
                 "next": [
                     "End"
                 ]
@@ -369,19 +437,19 @@ export var json = {
                 "text": "<执行源：目标>",
                 "note": "指定目标命令执行者。",
                 "list": "selector",
-                "length": "1",
+                "length": 1,
                 "next": [
                     {
                         "text": "<执行坐标：x y z>",
                         "note": "指定命令运行的位置。",
                         "list": "coordinate",
-                        "length": "2",
+                        "length": 2,
                         "next": [
                             {
                                 "text": "<命令：命令>",
                                 "note": "指定要运行的命令。",
                                 "judge": "/ /",
-                                "length": "3",
+                                "length": 5,
                                 "list": "executeCommand",
                                 "next": [
                                     "End"
@@ -390,33 +458,33 @@ export var json = {
                             {
                                 "text": "detect",
                                 "note": "检测方块。",
-                                "judge": "/\\bdetect\\b/g",
-                                "length": "3",
+                                "judge": "/detect/g",
+                                "length": 5,
                                 "list": "executeCommandWithDetect",
                                 "next": [
                                     {
                                         "text": "<探测坐标：x y z>",
                                         "note": "指定要检测方块的位置。",
                                         "list": "coordinate",
-                                        "length": "4",
+                                        "length": 6,
                                         "next": [
                                             {
                                                 "text": "<方块：方块>",
                                                 "note": "指定要检测的方块ID。",
                                                 "list": "block",
-                                                "length": "5",
+                                                "length": 7,
                                                 "next": [
                                                     {
                                                         "text": "<数据：整数>",
                                                         "note": "指定要检测的方块的数据值。",
                                                         "list": "blockData",
-                                                        "length": "6",
+                                                        "length": 8,
                                                         "next": [
                                                             {
                                                                 "text": "<命令：命令>",
                                                                 "note": "指定要运行的命令。",
                                                                 "list": "executeCommand",
-                                                                "length": "7",
+                                                                "length": 9,
                                                                 "next": [
                                                                     "End"
                                                                 ]
@@ -439,7 +507,84 @@ export var json = {
                 "text": "<特性：字符串>",
                 "note": "指定要定位的结构。",
                 "list": "locate",
-                "length": "1",
+                "length": 1,
+                "next": [
+                    "End"
+                ]
+            }
+        ],
+        "teleport": [
+            {
+                "text": "<目的地：x y z>",
+                "note": "",
+                "judge": "/ /",
+                "list": "coordinate",
+                "length": 1,
+                "next": [
+                    {
+                        "text": "[检查方块：布尔值]",
+                        "note": "",
+                        "judge": "/ /",
+                        "list": "boolean",
+                        "length": 4,
+                        "next": [
+                            "End"
+                        ]
+                    },
+                    {
+                        "text": "[y旋转角度：角度]",
+                        "note": "",
+                        "judge": "/[0-9]/g",
+                        "list": "",
+                        "length": 4,
+                        "next": [
+                            {
+                                "text": "[x旋转角度：角度]",
+                                "note": "",
+                                "list": "",
+                                "length": 5,
+                                "next": [
+                                    {
+                                        "text": "[检查方块：布尔值]",
+                                        "note": "",
+                                        "list": "boolean",
+                                        "length": 6,
+                                        "next": [
+                                            "End"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "text": "facing",
+                        "note": "",
+                        "judge": "/facing/g",
+                        "list": "",
+                        "length": 4,
+                        "next": [
+                            "End"
+                        ]
+                    }
+                ]
+            },
+            {
+                "text": "<目的地：目标>",
+                "note": "",
+                "judge": "/@/g",
+                "list": "selector",
+                "length": 1,
+                "next": [
+                    "End"
+                ]
+            },
+            {
+                "text": "<传送目标：目标>",
+                "note": "",
+                "judge": "/@/g",
+                "list": "selector",
+                "length": 1,
                 "next": [
                     "End"
                 ]
