@@ -40,6 +40,8 @@ const page = {
                 inputEle.value = ""
             } else if (replace === "none") {
                 inputEle.value = inputEle.value
+            } else if (replace === "the_latest_selector_variable") {
+                inputEle.value = inputEle.value.split(",", inputEle.value.split(",").length - 1).join(",")
             } else {
                 inputEle.value = inputEle.value.split(" ", inputEle.value.split(" ").length - 1).join(" ") + " "
             }
@@ -75,8 +77,11 @@ const page = {
             }
         },
         getParameterByLength: function (length) {
-            if (length === "theLatest") {
+            if (length === "the_latest_command_parameter") {
                 return inputEle.value.split(" ")[inputEle.value.split(" ").length - 1]
+            } else if (length === "the_latest_selector_variable") {
+            	var all = this.getParameterByLength("the_latest_command_parameter").split("[")[1].split(",")
+            	return all[all.length - 1]
             } else {
                 return inputEle.value.split(" ")[length]
             }
@@ -114,7 +119,7 @@ const page = {
                 for (var i = 0; i < document.querySelectorAll("#getListName").length; i++) {
                     document.querySelectorAll("#getListName")[i].innerHTML = listName
                 }
-            } else if (typeof model === undefined) {
+            } else if (model == null) {
                 return listName
             }
         },
@@ -132,7 +137,7 @@ const page = {
         loadFromJson: function (listName, i = 0) {
             listEle.setAttribute("data-list-name", listName)
             if (listName === "selector") {
-                var selector = page.inputEle.getParameterByLength("theLatest")
+                var selector = page.inputEle.getParameterByLength("the_latest_command_parameter")
                 if (selector.split("").length <= 1) {
                     this.loadFromJson("selector.parameter")
                 } else if (selector.split("").length === 2 && /@/g.test(selector) === true) {
@@ -156,7 +161,7 @@ const page = {
                 }
                 return
             } else if (listName === "coordinate") {
-                var coordinate = page.inputEle.getParameterByLength("theLatest")
+                var coordinate = page.inputEle.getParameterByLength("the_latest_command_parameter")
                 var coordinate_axis = grammarEle.querySelectorAll("span:not(.mdui-hidden)")[inputEle.value.split(" ").length - 1].getAttribute("data-grammar-coordinate-axis")
                 if (coordinate.split("").length < 1) {
                     this.loadFromJson(`coordinate.${coordinate_axis}`, 1)
@@ -167,7 +172,7 @@ const page = {
                 }
                 return
             } else if ((listName === "coordinate.x" || listName === "coordinate.y" || listName === "coordinate.z") && i === 0) {
-                var coordinate = page.inputEle.getParameterByLength("theLatest")
+                var coordinate = page.inputEle.getParameterByLength("the_latest_command_parameter")
                 var coordinate_axis = listName.split(".")[1]
                 if (coordinate.split("").length === 1 && (coordinate.split("")[0] === "~" || coordinate.split("")[0] === "^")) {
                     this.loadFromJson(`coordinate.${coordinate_axis}[0].value`)
@@ -240,6 +245,7 @@ const page = {
                     return `<a class="mdui-btn mdui-btn-icon mdui-list-item-display-when-hover" href="${output}" target="_blank" id="listURL"><i class="mdui-icon material-icons mdui-text-color-black-icon">send</i></a>`
                 }
             }
+            console.log(listName)
             if (eval(`page.json.main.${LANG}`) !== undefined) {
                 if (eval(`page.json.main.${LANG}.list`) !== undefined) {
                     if (eval(`page.json.main.${LANG}.list.${listName}`) !== undefined) {
@@ -276,9 +282,12 @@ const page = {
             }
         },
         search: function () {
-            return
-            var text = page.inputEle.getParameterByLength("theLatest")
-            if (/next/g.test(page.inputEle.getCommandName()) === true) return
+            var text = page.inputEle.getParameterByLength("the_latest_command_parameter")
+            if (/next/g.test(page.listEle.getListName()) === true || /coordinate/g.test(page.listEle.getListName()) === true || page.listEle.getListName().startsWith("selector.variable[")) {
+            	return
+            } else if (page.listEle.getListName() === "selector.variable") {
+            	text = page.inputEle.getParameterByLength("the_latest_selector_variable")
+            }
             var e = 0
             for (var i = 0; i < listEle.querySelectorAll('.mdui-list-item').length; i++) {
                 listEle.querySelectorAll('.mdui-list-item')[i].style.display = "none"

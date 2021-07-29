@@ -79,18 +79,18 @@
 - `list_name`
     - 列表的名词，调用时需输入该列表相对"list"的位置
     - 例：有两个个列表为
-```javascript
-"list": {
-    "block": [
-        ...
-    ],
-    "coordinate": {
-        "x": [
+    ```javascript
+    "list": {
+        "block": [
             ...
-        ]
+        ],
+        "coordinate": {
+            "x": [
+                ...
+            ]
+        }
     }
-}
-```
+    ```
     - 那么，它应该为`block`和`coordinate.x`
     - **必填，否则会出现 JSON 语法错误**
 - `list_name[0]`
@@ -126,7 +126,10 @@
     - `.replace`规定了它的替换规则
         - 为`"all"`将会替换整个输入栏的内容
         - 为`"none"`将不替换任何内容
-        - 不填或填其他内容将会替换输入栏中最新的一个命令参数（`page.inputEle.getParameterByLength("theLatest")`）
+        - 不填或填其他内容将会替换输入栏中最新的一个命令参数（`page.inputEle.getParameterByLength("the_latest_command_parameter")`）
+    - `.text`规定了最终会添加进输入栏的内容
+        - 可以用`{name}`调用此列表项的`name`
+        - 可以用`{info}`调用此列表项的`info`
     - 它可以写在`template`中
 - `auto_next_list`'
     - 规定自动切换的下一个列表
@@ -136,6 +139,17 @@
 - 一个可以正常加载的空列表应该为
 ```javascript
 "list_name": []
+
+// or
+
+"list_name": [
+	{
+		"template": {}
+	},
+	{
+		"name": ""
+	}
+]
 ```
 
 ## 语法

@@ -341,7 +341,7 @@ export var json = {
                     "template": {
                         "url": "{command_page}",
                         "input": {
-                            "replace": "none",
+                            "replace": "the_latest_selector_variable",
                             "text": "{name}="
                         }
                     }
