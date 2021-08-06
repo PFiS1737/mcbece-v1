@@ -46,7 +46,7 @@
             <div class="mdui-toolbar mdui-color-white" style="height: 60px;">
                 <div class="mdui-list-item-content">
                     <div class="mdui-list-item-title" id="grammar" style="overflow-x: scroll;"></div>
-                    <div class="mdui-list-item-text mdui-list-item-one-line" id="note"></div>
+                    <div class="mdui-list-item-text mdui-list-item-one-line" id="note" style="overflow-x: scroll;"></div>
                 </div>
                 <a class="mdui-btn mdui-btn-icon" target="_blank" id="wiki" mdui-tooltip="{content: 'WIKI'}">
                     <i class="mdui-icon material-icons mdui-text-color-theme-icon">send</i>
@@ -61,33 +61,33 @@
             <i class="mdui-icon material-icons">apps</i>
         </button>
         <div class="mdui-drawer mdui-drawer-right mdui-drawer-always-wide mdui-drawer-full-height mdui-color-white mdui-drawer-close mdui-p-t-2 mdui-p-x-2" id="drawer">
-                <div class="mdui-card mdui-shadow-6 mdui-m-b-2" id="Setting-card" style="border-radius: 6px;">
-                    <div class="mdui-card-primary mdui-p-t-2">
-                        <div class="mdui-card-primary-title">设置</div>
-                        <div class="mdui-card-primary-subtitle">你可以通过这个工具修改网站设置</div>
-                    </div>
-                    <div class="mdui-card-actions">
-                        <button class="mdui-btn mdui-text-color-theme-accent mdui-ripple mdui-float-right mdui-m-r-0" mdui-dialog="{target: '#Setting-tool', history: false, modal: true}">打开</button>
-                    </div>
+            <div class="mdui-card mdui-shadow-6 mdui-m-b-2" id="Setting-card" style="border-radius: 6px;">
+                <div class="mdui-card-primary mdui-p-t-2">
+                    <div class="mdui-card-primary-title">设置</div>
+                    <div class="mdui-card-primary-subtitle">你可以通过这个工具修改网站设置</div>
                 </div>
-                <div class="mdui-card mdui-shadow-6 mdui-m-b-2" id="Custom-card" style="border-radius: 6px;">
-                    <div class="mdui-card-primary mdui-p-t-2">
-                        <div class="mdui-card-primary-title">自定义</div>
-                        <div class="mdui-card-primary-subtitle">您可以通过这个工具对本站进行自定义</div>
-                    </div>
-                    <div class="mdui-card-actions">
-                        <button class="mdui-btn mdui-text-color-theme-accent mdui-ripple mdui-float-right mdui-m-r-0" mdui-dialog="{target: '#Custom-tool', history: false, modal: true}">打开</button>
-                    </div>
+                <div class="mdui-card-actions">
+                    <button class="mdui-btn mdui-text-color-theme-accent mdui-ripple mdui-float-right mdui-m-r-0" mdui-dialog="{target: '#Setting-tool', history: false, modal: true}">打开</button>
                 </div>
-                <div class="mdui-card mdui-shadow-6 mdui-m-b-2" id="Exhaustive-card" style="border-radius: 6px; display: none;">
-                    <div class="mdui-card-primary">
-                        <div class="mdui-card-primary-title">穷举助手</div>
-                        <div class="mdui-card-primary-subtitle">您可以通过这个工具输入穷举的内容</div>
-                    </div>
-                    <div class="mdui-card-actions">
-                        <button class="mdui-btn mdui-text-color-theme-accent mdui-ripple mdui-float-right mdui-m-r-0" mdui-dialog="{target: '#Exhaustive-tool', history: false, modal: true}">打开</button>
-                    </div>
+            </div>
+            <div class="mdui-card mdui-shadow-6 mdui-m-b-2" id="Custom-card" style="border-radius: 6px;">
+                <div class="mdui-card-primary mdui-p-t-2">
+                    <div class="mdui-card-primary-title">自定义</div>
+                    <div class="mdui-card-primary-subtitle">您可以通过这个工具对本站进行自定义</div>
                 </div>
+                <div class="mdui-card-actions">
+                    <button class="mdui-btn mdui-text-color-theme-accent mdui-ripple mdui-float-right mdui-m-r-0" mdui-dialog="{target: '#Custom-tool', history: false, modal: true}">打开</button>
+                </div>
+            </div>
+            <div class="mdui-card mdui-shadow-6 mdui-m-b-2" id="Exhaustive-card" style="border-radius: 6px; display: none;">
+                <div class="mdui-card-primary">
+                    <div class="mdui-card-primary-title">穷举助手</div>
+                    <div class="mdui-card-primary-subtitle">您可以通过这个工具输入穷举的内容</div>
+                </div>
+                <div class="mdui-card-actions">
+                    <button class="mdui-btn mdui-text-color-theme-accent mdui-ripple mdui-float-right mdui-m-r-0" mdui-dialog="{target: '#Exhaustive-tool', history: false, modal: true}">打开</button>
+                </div>
+            </div>
         </div>
         <!--工具-->
         <div class="mdui-dialog" id="Setting-tool">
@@ -129,8 +129,6 @@
                     <div class="mdui-col-xs-1 mdui-p-b-1" style="width: 30px;"></div>
                     <div class="mdui-col-xs-11 mdui-p-b-1">
                         <span class="mdui-typo">
-                            每行只能输入<strong>一个</strong>链接<br />
-                            请确保每条 JavaScript 链接都以 ".js" 结尾<br />
                             网站会自动识别以 "/custom.json" 结尾的链接，并使用其中的内容<br />
                             点击保存后会<strong>刷新页面</strong><br />
                             您添加的所有信息都将保存在 localStorage 中
@@ -198,7 +196,7 @@
                         <div class="mdui-col-xs-11 mdui-p-b-1">
                             <button class="mdui-btn mdui-ripple mdui-color-theme-accent mdui-m-r-1" onclick="page.listEle.exhaustive.button.select.all()">全选</button>
                             <button class="mdui-btn mdui-ripple mdui-color-theme-accent mdui-m-r-1" onclick="page.listEle.exhaustive.button.select.none()">全不选</button>
-                            <button class="mdui-btn mdui-ripple mdui-color-theme-accent mdui-m-r-1" onclick="page.listEle.exhaustive.button.select.back()">反选</button>
+                            <button class="mdui-btn mdui-ripple mdui-color-theme-accent mdui-m-r-1" onclick="page.listEle.exhaustive.button.select.contrary()">反选</button>
                         </div>
                         <div class="mdui-col-xs-12 mdui-p-b-1">
                             <div class="mdui-typo-title">预览：</div>
@@ -274,6 +272,6 @@
             }
         </script>
         <script src="./js/index.js"></script>
-        <script type="module" src="./js/load-json.js"></script>
+        <script type="module" src="./js/module.js"></script>
     </body>
 </html>

@@ -1,14 +1,37 @@
 # 文档 | 简体中文
 
 > 目录
-> - ...
+> - 介绍
+> - 文件结构
+> - JS 结构
 > - [自定义](#自定义)
 > - ...
+
+# 介绍
+
+为广大 Minecraft 基岩版命令爱好者准备的在线命令辅助编辑器。
+- 部署
+    - 本项目全部使用原生 HTML、JS、CSS 编写，纯静态环境，无需任何服务端知识即可完成部署
+    - （主要原因是我不会 [doge]）
+    - 本项目使用 Vercel 进行在线部署
+
+## 功能
+
+...
+
+# 文件结构
+
+```
+(root)
+
+
+
+```
 
 # 自定义
 
 > 你需要能熟练使用 JSON，并对 JavaScript 有一定理解  
-> 你可能需要对本项目的 JS 有一定了解（阅读 [#JS结构](#JS结构)）
+> 你可能需要对本项目的 JS 有一定了解
 
 ## 文件
 
@@ -102,7 +125,8 @@
     - `template`
         - 模板
         - **必填，否则会报错**
-        - 可以有`template.url`、`template.input`和`auto_next_list`
+        - 可以有`template.url`、`template.input`和`template.auto_next_list`
+        - 若在列表项中重新声明，将覆盖模板中的内容
 - `image`
     - 列表项图片
 
@@ -117,17 +141,17 @@
     - 列表项对应的链接
     - 可以用`{name}`调用此列表项的`name`
     - 可以用`{info}`调用此列表项的`info`
-    - 可以用`{command_page}`调用`page.text.${LANG}.url.command_page`的内容
-    - 可以用`{normal_page}`调用`page.text.${LANG}.url.normal_page`的内容
-    - 可以用`{search_page}`调用`page.text.${LANG}.url.search_page`的内容
+    - 可以用`{command_page}`调用`page.json.main.${LANG}.text.url.command_page`的内容
+    - 可以用`{normal_page}`调用`page.json.main.${LANG}.text.url.normal_page`的内容
+    - 可以用`{search_page}`调用`page.json.main.${LANG}.text.url.search_page`的内容
     - 它可以写在`template`中
 - `input`
     - 点击列表项后输入到输入栏的内容及规则
-    - `.replace`规定了它的替换规则
+    - `input.replace`规定了它的替换规则
         - 为`"all"`将会替换整个输入栏的内容
         - 为`"none"`将不替换任何内容
         - 不填或填其他内容将会替换输入栏中最新的一个命令参数（`page.inputEle.getParameterByLength("the_latest_command_parameter")`）
-    - `.text`规定了最终会添加进输入栏的内容
+    - `input.text`规定了最终会添加进输入栏的内容
         - 可以用`{name}`调用此列表项的`name`
         - 可以用`{info}`调用此列表项的`info`
     - 它可以写在`template`中
@@ -137,92 +161,51 @@
     - 它的内容应该为一个或多个列表名称，例如上文中的`block`和`coordinate.x`
     - 它可以写在`template`中
 - 一个可以正常加载的空列表应该为
-```javascript
-"list_name": []
-
-// or
-
-"list_name": [
-	{
-		"template": {}
-	},
-	{
-		"name": ""
-	}
-]
-```
-
-## 语法
-
-> **暂不支持自定义**
-
-### Json 结构
-
-```javascript
-"command_name": [
-    {
-        "text": "",
-        "note": "",
-        "list": "",
-        "length": Number,
-        "next": [
-            {
-            	"text": "",
-                "note": "",
-                "judge": "Regular",
-                "list": "",
-                "length": Number,
-                "next": [
-                    {
-                        "text": "",
-                        "note": "",
-                        "list": "",
-                        "length": Number,
-                        "next": [
-                            "End"
-                        ]
-                    }
-                ]
-            },
-            {
-            	"text": "",
-                "note": "",
-                "judge": "Regular",
-                "list": "",
-                "length": Number,
-                "next": [
-                    "End"
-                ]
-            }
-        ]
-    }
-[
-```
-
-### 解析
-
-- `command_name`
-    - 对应的命令的名称
-    - 删去最前面的`/`
-- `text`
-    - 一段语法
-    - 应用`<>`或`[]`包裹，表示必要或非必要
-- `note`
-    - 对`text`的解释
-- `list`
-    - 与列表中`auto_next_list`写法相同
-    - 但当这个语法项对应的是目标选择器的话，应该为`selector`
-    - 当这个语法项为坐标且类似`<XXX：x y z>`或`[XXX：x y z]`时，应该为`coordinate`
-    - 但当类似`<XXX：x>`、`[XXX：x]`、`<XXX：y>`、`[XXX：y]`、`<XXX：z>`、`[XXX：z]`等，应为`coordinate.x`、`coordinate.y`或`coordinate.z`
-- `length`
-    - 该语法项在某条语法中所在的位置
-    - 应为一个数字
-    - 类似`<XXX：x y z>`或`[XXX：x y z]`的语法同时占3个长度
-    - 即假如这个语法项的`length`为`3`，那么它下一个语法项的`length`应为`6`
-- `next`
-    - 下一个语法项
-    - 当一段语法接受，应为`["End"]`（`End`必须大写）
-- `judge`
-    - 当同级的语法项对于1时，应为每个语法项添加`judge`
-    - 它的值是一个字符串，其中是一个正则表达式
-    - 编写时注意部分字符的转义
+    - 不包含任何项
+    - 可以包含配置项
+    - 如果包含列表项，则**必须**有配置项，且配置项中必须有`template`，否则会报错
+    - 即：
+    ```javascript
+    // good
+    "list_name": []
+    
+    // good
+    "list_name": [
+    	{
+    		"template": {...}
+    	}
+    ]
+    
+    // good
+    "list_name": [
+	    {}
+    ]
+    
+    // good
+    "list_name": [
+    	{
+    		"template": {...}
+    	},
+    	{
+    		"name": "",
+    		...
+    	}
+    ]
+    
+    // error
+    "list_name": [
+    	{
+    		"name": "",
+    		...
+    	}
+    ]
+    
+    // error
+    "list_name": [
+    	{},
+    	{
+    		"name": "",
+    		...
+    	}
+    ]
+    ```

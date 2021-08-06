@@ -2,10 +2,28 @@ const inputEle = document.querySelector('#edit')
 const grammarEle = document.querySelector("#grammar")
 const noteEle = document.querySelector("#note")
 const listEle = document.querySelector("#list")
-const wikiEle = document.querySelector("#wiki")
-const copyEle = document.querySelector("#copy")
 
 let LANG
+
+String.prototype.isCoordinate = function (model) {
+    var matchRegex = /[-~^.0-9]+/
+    var testRegex = /^(~|\^)?(-?[.0-9])*$/
+    if (model === `test`) {
+        return testRegex.test(this)
+    } else {
+        return matchRegex.test(this)
+    }
+}
+
+String.prototype.isSelector = function (model) {
+    var matchRegex = /^@[a-z]?(\[[-~^=,\.\w]*\]?)?/
+    var testRegex = /^(@[a-z])?(\[[-~^=,\.\w]*\])?$/
+    if (model === `test`) {
+        return testRegex.test(this)
+    } else {
+        return matchRegex.test(this)
+    }
+}
 
 const page = {
     json: {
@@ -27,7 +45,7 @@ const page = {
     change: function () {
         var commandLength = inputEle.value.split(" ").length
         this.edit.begin()
-        if (inputEle.value === "") return
+        if (inputEle.value.split(" ").length === 1) return
         this.grammarEle.load()
         if (grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1] !== undefined) {
             this.listEle.load(`${grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1].getAttribute("data-grammar-command-list")}`)
@@ -41,9 +59,18 @@ const page = {
             } else if (replace === "none") {
                 inputEle.value = inputEle.value
             } else if (replace === "the_latest_selector_variable") {
-                inputEle.value = inputEle.value.split(",", inputEle.value.split(",").length - 1).join(",")
+                var selector_variable = inputEle.value.split("[")[inputEle.value.split("[").length - 1]
+                if (/,/.test(selector_variable) === true) {
+                    inputEle.value = inputEle.value.split(",", inputEle.value.split(",").length - 1).join(",") + ","
+                } else {
+                    inputEle.value = inputEle.value.split("[", inputEle.value.split("[").length - 1).join("[") + "["
+                }
             } else {
-                inputEle.value = inputEle.value.split(" ", inputEle.value.split(" ").length - 1).join(" ") + " "
+                if (inputEle.value.split(" ").length === 1) {
+                    inputEle.value = "/"
+                } else {
+                    inputEle.value = inputEle.value.split(" ", inputEle.value.split(" ").length - 1).join(" ") + " "
+                }
             }
             inputEle.value += text
         },
@@ -59,21 +86,21 @@ const page = {
                     closeOnOutsideClick: false
                 })
             } else if (request === "display") {
-                if (listEle.getAttribute("data-edit-finished") == "true") {
-                    wikiEle.style.display = "none"
-                    copyEle.style.display = ""
+                if (listEle.getAttribute("data-edit-finished") === "true") {
+                    document.querySelector("#wiki").style.display = "none"
+                    document.querySelector("#copy").style.display = ""
                 } else {
-                    wikiEle.style.display = ""
-                    copyEle.style.display = "none"
+                    document.querySelector("#wiki").style.display = ""
+                    document.querySelector("#copy").style.display = "none"
                 }
             }
         },
         getCommandName: function () {
             var commandName = inputEle.value.split(" ")[0]
             if (commandName === "") {
-                return "undefined"
+                return undefined
             } else {
-                return inputEle.value.split(" ")[0].split("/")[1]
+                return commandName
             }
         },
         getParameterByLength: function (length) {
@@ -90,23 +117,23 @@ const page = {
     edit: {
         begin: function () {
             var commandLength = inputEle.value.split(" ").length
-            wikiEle.href = eval(`page.text.${LANG}.url.command_page`) + inputEle.value.split(" ")[0]
+            document.querySelector("#wiki").href = page.json.main[LANG].text.url.command_page + inputEle.value.split(" ")[0]
             listEle.setAttribute("data-edit-finished", "false")
             page.inputEle.copy("display")
             if (commandLength === 1) {
                 page.listEle.load("command")
             }
             if (inputEle.value === "") {
-                inputEle.placeholder = eval(`page.text.${LANG}.inputText`)
+                inputEle.placeholder = page.json.main[LANG].text.inputText
                 grammarEle.innerHTML = ""
-                noteEle.innerHTML = eval(`page.text.${LANG}.beginText`)
+                noteEle.innerHTML = page.json.main[LANG].text.beginText
             }
         },
         finish: function () {
             if (listEle.getAttribute("data-edit-finished") === "true") {
                 listEle.innerHTML = ""
                 grammarEle.innerHTML = ""
-                noteEle.innerHTML = eval(`page.text.${LANG}.endText`)
+                noteEle.innerHTML = page.json.main[LANG].text.endText
                 listEle.setAttribute("data-list-name", "none")
                 page.inputEle.copy("display")
             }
@@ -123,63 +150,77 @@ const page = {
                 return listName
             }
         },
-        load: function (listName , i = 0) {
-            console.log({listName})
+        load: function (listName) {
+            //console.log({listName})
             if (listEle.getAttribute("data-list-name") !== listName) {
                 listEle.innerHTML = ""
                 for (var i = 0; i < listName.split(",").length; i++) {
-                    this.loadFromJson(listName.split(",")[i].replace(" ", ""))
+                    this.loadFromJson(listName.split(",")[i].replace(/\s/g, ""))
+                    if (i === listName.split(",").length - 1) continue
+                    listEle.innerHTML += '<div class="mdui-divider"></div>'
                 }
                 this.getListName("display")
                 this.exhaustive.judge()
             }
         },
-        loadFromJson: function (listName, i = 0) {
+        loadFromJson: function (listName, isReassign = true) {
             listEle.setAttribute("data-list-name", listName)
+            if (isReassign === true) {
             if (listName === "selector") {
                 var selector = page.inputEle.getParameterByLength("the_latest_command_parameter")
                 if (selector.split("").length <= 1) {
                     this.loadFromJson("selector.parameter")
-                } else if (selector.split("").length === 2 && /@/g.test(selector) === true) {
+                } else if (selector.split("").length === 2 && selector.startsWith("@") === true) {
+                    listEle.innerHTML = ""
                     this.loadFromJson("selector.next")
                 } else if (selector.split("").length > 2) {
                     var variable_item = selector.split("[")[1].split("]")[0].split(",")[selector.split("[")[1].split("]")[0].split(",").length - 1]
                     var key = variable_item.split("=")[0]
                     var value = variable_item.split("=")[1]
                     if (key !== undefined && key !== "" && value !== undefined && value !== "") {
+                        listEle.innerHTML = ""
                         this.loadFromJson("selector.next_variable")
                     } else if (key !== undefined && key !== "" && value === "") {
                         var arr = new Array
-                        if (eval(`page.json.main.${LANG}.list.selector.variable.filter(function(item){return item.name === "${key}"})`)[0] !== undefined) {
-                            eval(`page.json.main.${LANG}.list.selector.variable.filter(function(item, index){return item.name === "${key}" && arr.push(index)})`)
-                            listName = `selector.variable[${arr[0]}].value`
+                        var dataName = "main" || "custom"
+                        if (page.json[dataName][LANG].list.selector.variable.find(function(item){return item.name===key}) !== undefined) {
+                            listEle.innerHTML = ""
+                            this.loadFromJson(`selector.variable[${page.json[dataName][LANG].list.selector.variable.findIndex((item)=>{return item.name===key})}].value`)
                         }
-                        this.loadFromJson(listName)
                     } else if ((key === "" && value === undefined) || (key !== undefined && key !== "" && value === undefined)) {
+                        listEle.innerHTML = ""
                         this.loadFromJson("selector.variable")
                     }
                 }
                 return
             } else if (listName === "coordinate") {
+                
                 var coordinate = page.inputEle.getParameterByLength("the_latest_command_parameter")
-                var coordinate_axis = grammarEle.querySelectorAll("span:not(.mdui-hidden)")[inputEle.value.split(" ").length - 1].getAttribute("data-grammar-coordinate-axis")
+                var coordinate_axis = page.grammarEle.now("element").getAttribute("data-grammar-coordinate-axis")
                 if (coordinate.split("").length < 1) {
-                    this.loadFromJson(`coordinate.${coordinate_axis}`, 1)
-                } else if (coordinate.split("").length === 1 && (coordinate.split("")[0] === "~" || coordinate.split("")[0] === "^")) {
-                    this.loadFromJson(`coordinate.${coordinate_axis}[0].value`)
+                    this.loadFromJson(`coordinate.${coordinate_axis}`, false)
+                } else if (coordinate.split("").length === 1 || (coordinate.split("")[0] === "~" || coordinate.split("")[0] === "^")) {
+                    listEle.innerHTML = ""
+                    this.loadFromJson(`coordinate.${coordinate_axis}[0].value`, false)
                 } else if (coordinate.split("").length >= 1) {
+                    listEle.innerHTML = ""
                     this.loadFromJson("next")
                 }
                 return
-            } else if ((listName === "coordinate.x" || listName === "coordinate.y" || listName === "coordinate.z") && i === 0) {
-                var coordinate = page.inputEle.getParameterByLength("the_latest_command_parameter")
-                var coordinate_axis = listName.split(".")[1]
-                if (coordinate.split("").length === 1 && (coordinate.split("")[0] === "~" || coordinate.split("")[0] === "^")) {
-                    this.loadFromJson(`coordinate.${coordinate_axis}[0].value`)
-                } else if (coordinate.split("").length >= 1) {
+            } else if (listName === "rotation") {
+                var rotation = page.inputEle.getParameterByLength("the_latest_command_parameter")
+                var rotation_axis = page.grammarEle.now("element").getAttribute("data-grammar-rotation-axis")
+                if (rotation.split("").length < 1) {
+                    this.loadFromJson(`commands.tp.rotation.${rotation_axis}`, false)
+                } else if (rotation.split("").length === 1 || rotation.split("")[0] === "~") {
+                    listEle.innerHTML = ""
+                    this.loadFromJson(`commands.tp.rotation.${rotation_axis}[0].value`, false)
+                } else if (rotation.split("").length >= 1) {
+                    listEle.innerHTML = ""
                     this.loadFromJson("next")
                 }
                 return
+            }
             }
             function displayListImage(i, listName, dataName) {
                 if (eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === undefined || eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].image`) === "") {
@@ -241,11 +282,11 @@ const page = {
                 if (url === undefined || url === "") {
                     return ""
                 } else {
-                    var output = url.replace(/{name}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)).replace(/{info}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)).replace(/{command_page}/g, eval(`page.text.${LANG}.url.command_page`)).replace(/{normal_page}/g, eval(`page.text.${LANG}.url.normal_page`)).replace(/{search_page}/g, eval(`page.text.${LANG}.url.search_page`))
+                    var output = url.replace(/{name}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].name`)).replace(/{info}/g, eval(`page.json.${dataName}.${LANG}.list.${listName}[${i}].info`)).replace(/{command_page}/g, eval(`page.json.main.${LANG}.text.url.command_page`)).replace(/{normal_page}/g, eval(`page.json.main.${LANG}.text.url.normal_page`)).replace(/{search_page}/g, eval(`page.json.main.${LANG}.text.url.search_page`))
                     return `<a class="mdui-btn mdui-btn-icon mdui-list-item-display-when-hover" href="${output}" target="_blank" id="listURL"><i class="mdui-icon material-icons mdui-text-color-black-icon">send</i></a>`
                 }
             }
-            console.log(listName)
+            //console.log(listName)
             if (eval(`page.json.main.${LANG}`) !== undefined) {
                 if (eval(`page.json.main.${LANG}.list`) !== undefined) {
                     if (eval(`page.json.main.${LANG}.list.${listName}`) !== undefined) {
@@ -283,20 +324,22 @@ const page = {
         },
         search: function () {
             var text = page.inputEle.getParameterByLength("the_latest_command_parameter")
-            if (/next/g.test(page.listEle.getListName()) === true || /coordinate/g.test(page.listEle.getListName()) === true || page.listEle.getListName().startsWith("selector.variable[")) {
+            if (/next/g.test(page.listEle.getListName()) === true || page.listEle.getListName().startsWith("coordinate") === true || page.listEle.getListName().startsWith("selector.variable[") === true) {
             	return
             } else if (page.listEle.getListName() === "selector.variable") {
             	text = page.inputEle.getParameterByLength("the_latest_selector_variable")
+            } else if (page.listEle.getListName() === "command") {
+                text = text.replace("/", "")
             }
             var e = 0
             for (var i = 0; i < listEle.querySelectorAll('.mdui-list-item').length; i++) {
                 listEle.querySelectorAll('.mdui-list-item')[i].style.display = "none"
-                if (listEle.querySelectorAll('#listName')[i].innerHTML.startsWith(text) == true || eval(`/${text}/g.test(listEle.querySelectorAll('#listName')[i].innerHTML)`) == true) {
+                if (listEle.querySelectorAll('#listName')[i].innerHTML.startsWith(text) === true || eval(`/${text}/g.test(listEle.querySelectorAll('#listName')[i].innerHTML)`) === true) {
                     listEle.querySelectorAll('.mdui-list-item')[i].style.display = ""
                     e++
                 }
-                if (e == 0) {
-                    if (listEle.querySelectorAll('#listInfo')[i].innerHTML.startsWith(text) == true || eval(`/${text}/g.test(listEle.querySelectorAll('#listInfo')[i].innerHTML)`) == true) {
+                if (e === 0) {
+                    if (listEle.querySelectorAll('#listInfo')[i].innerHTML.startsWith(text) === true || eval(`/${text}/g.test(listEle.querySelectorAll('#listInfo')[i].innerHTML)`) === true) {
                         listEle.querySelectorAll('.mdui-list-item')[i].style.display = ""
                     }
                 }
@@ -325,7 +368,7 @@ const page = {
                     </label>` + listEle.querySelectorAll(".mdui-list-item")[i].innerHTML
                             listEle.querySelectorAll("label")[i].addEventListener("click", () => {
                                 for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
-                                    if (listEle.querySelectorAll(".mdui-list-item")[i].querySelector("input").checked == true) {
+                                    if (listEle.querySelectorAll(".mdui-list-item")[i].querySelector("input").checked === true) {
                                         listEle.querySelectorAll(".mdui-list-item")[i].classList.add("mdui-list-item-active")
                                     } else {
                                         listEle.querySelectorAll(".mdui-list-item")[i].classList.remove("mdui-list-item-active")
@@ -354,10 +397,10 @@ const page = {
                             }
                         }
                     },
-                    back: function () {
+                    contrary: function () {
                         if (listEle.getAttribute("data-is-exhaustive") === "true") {
                             for (var i = 0; i < listEle.querySelectorAll(".mdui-list-item").length; i++) {
-                                if (listEle.querySelectorAll("input")[i].checked == true) {
+                                if (listEle.querySelectorAll("input")[i].checked === true) {
                                     listEle.querySelectorAll("input")[i].checked = false
                                     listEle.querySelectorAll(".mdui-list-item")[i].classList.remove("mdui-list-item-active")
                                 } else {
@@ -369,13 +412,13 @@ const page = {
                     }
                 },
                 add: function () {
-                    if (listEle.getAttribute("data-is-exhaustive") == "true") {
+                    if (listEle.getAttribute("data-is-exhaustive") === "true") {
                         page.inputEle.add(page.listEle.exhaustive.output())
                     }
                 }
             },
             preview: function () {
-                if (listEle.getAttribute("data-is-exhaustive") == "true") {
+                if (listEle.getAttribute("data-is-exhaustive") === "true") {
                     document.querySelector(`${document.querySelector("#Exhaustive-tool").querySelector(".mdui-tab-active").href}`).querySelector("#getExhaustivePreview").value = outputExhaustive()
                 }
             },
@@ -383,158 +426,152 @@ const page = {
         }
     },
     grammarEle: {
+        now: function (model) {
+            var commandLength = inputEle.value.split(" ").length
+            var item = grammarEle.querySelectorAll("span")[commandLength - 1]
+            if (item === undefined) return undefined
+            if (model === "element") {
+                return item
+            } else {
+                var id = Number(item.id)
+                var length = Number(item.getAttribute("data-grammar-command-length"))
+                var list = item.getAttribute("data-grammar-command-list")
+                return {
+                    id: id,
+                    length: length,
+                    list: list
+                }
+            }
+        },
         load: function (commandName = page.inputEle.getCommandName()) {
             grammarEle.innerHTML = ""
             noteEle.innerHTML = ""
-            if (eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${commandName}"})`)[0] !== undefined) {
-                grammarEle.innerHTML = `<span id="0" data-grammar-command-length="0" data-grammar-command-list="command">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${commandName}"})`)[0].name} </span>`
-                noteEle.innerHTML = `<span id="0" style="display: none;">${eval(`page.json.main.${LANG}.list.command.filter(function(item){return item.name === "/${commandName}"})`)[0].info}</span>`
-                this.loadFromJson(`page.json.main.${LANG}.grammar.${commandName}[0]`, commandName)
-                this.display("grammarEle")
-                this.strong()
-            } else {
-                grammarEle.innerHTML = `<span>/${commandName} </span>`
-                noteEle.innerHTML = `未知的命令（此命令不存在于 page.json.main.${LANG}.list.command 中）`
-            }
-        },
-        loadFromJson: function (str, commandName, id = 1) {
-            var thisGrammarEle = grammarEle.querySelectorAll("span.part")[document.querySelectorAll("span.part").length - 1] || grammarEle
-            if (eval(str.split("[", str.split("[").length - 1).join("[")) !== undefined) {
-                if (eval(str.split("[", str.split("[").length - 1).join("[")).length > 1) {
-                    for (var e = 0; e < eval(str.split("[", str.split("[").length - 1).join("[")).length; e++) {
-                        str = str.split("[", str.split("[").length - 1).join("[") + `[${e}]`
-                        var newEle = document.createElement("SPAN")
-                        var text = eval(`${str}.text`) + " "
-                        newEle.id = id
-                        newEle.classList.add("part")
-                        newEle.classList.add("mdui-hidden")
-                        newEle.style = "font-weight: normal !important;"
-                        newEle.setAttribute("data-grammar-command-length", `${eval(`${str}.length`)}`)
-                        newEle.setAttribute("data-grammar-command-list", eval(`${str}.list`))
-                        newEle.setAttribute("data-grammar-judge", eval(`${str}.judge`))
-                        if (eval(`${str}.exhaustive`) === "true") {
-                            newEle.setAttribute("data-grammar-command-exhaustive", "true")
-                        }
-                        if (eval(`${str}.list`) === "coordinate") {
-                            // text = text.replace("x y z", `x <span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden">y</span> <span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" data-grammar-judge="${eval(`${str}.judge`)}" class="part mdui-hidden">z</span>`)
-                            // text = `<span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" data-grammar-judge="${eval(`${str}.judge`)}" class="part mdui-hidden">${text}</span></span>`
-                               text = `<span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" class="mdui-hidden">${text}</span></span>`
-                            // text = `<span id="${id}" data-grammar-command-list="coordinate.y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="coordinate.z" data-grammar-command-length="${eval(`${str}.length`) + 2}" class="mdui-hidden">${text}</span></span>`
-                            // newEle.setAttribute("data-grammar-command-list", "coordinate.x")
-                            // newEle.classList.remove("part")
-                            // newEle.removeAttribute("data-grammar-judge")
-                            newEle.setAttribute("data-grammar-coordinate-axis", "x")
-                        }
-                        newEle.innerHTML = text
-                        thisGrammarEle.appendChild(newEle)
-                        noteEle.innerHTML += `<span id="${id}" style="display: none;">${eval(`${str}.note`)}</span>`
-                        id++
-                        this.loadFromJson(`${str}.next[0]`, commandName, id)
-                    }
-                } else if (eval(str) !== "End") {
+            var grammarGroup = page.json.main[LANG].grammar.find(item => {
+                return eval(`${item[0].command.name}.test(commandName)`) === true
+            })
+            //console.log({grammarGroup})
+            if (grammarGroup !== undefined) {
+                grammarEle.innerHTML = `<span id="0" data-grammar-command-length="0" data-grammar-command-list="command">${commandName} </span>`
+                noteEle.innerHTML = `<span id="0" style="display: none;">${grammarGroup[0].command.info}</span>`
+                var result = this.getFromJson(grammarGroup).grammar
+                for (var i = 0; i < result.length; i++) {
                     var newEle = document.createElement("SPAN")
-                    var text = eval(`${str}.text`) + " "
-                    newEle.id = id
-                    newEle.classList.add("mdui-hidden")
-                    newEle.style = "font-weight: normal !important;"
-                    newEle.setAttribute("data-grammar-command-length", `${eval(`${str}.length`)}`)
-                    newEle.setAttribute("data-grammar-command-list", eval(`${str}.list`))
-                    if (eval(`${str}.exhaustive`) === "true") {
-                        newEle.setAttribute("data-grammar-command-exhaustive", "true")
-                    }
-                    if (eval(`${str}.list`) === "coordinate") {
-                        //text = text.replace("x y z", `x <span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}">y</span> <span id="${id}" data-grammar-command-list="${eval(`${str}.list`)}" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}">z</span>`)
-                        // text = `<span id="${id}" data-grammar-command-list="coordinate.y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="coordinate.z" data-grammar-command-length="${eval(`${str}.length`) + 2}" class="mdui-hidden">${text}</span></span>`
-                        text = `<span id="${id}" data-grammar-command-list="coordinate" data-grammar-coordinate-axis="y" data-grammar-command-length="${eval(`${str}.length`) + 1}" class="mdui-hidden"><span id="${id}" data-grammar-command-list="coordinate" data-grammar-coordinate-axis="z" data-grammar-command-length="${eval(`${str}.length`) + 2}" class="mdui-hidden">${text}</span></span>`
-                        // newEle.setAttribute("data-grammar-command-list", "coordinate.x")
+                    var id = i + 1
+                    var length = result[i].length
+                    var list = result[i].list
+                    var text = result[i].text + " "
+                    var note = result[i].note
+                    if (list.replace(/\s/g, "").split(",").includes("coordinate") === true) {
+                        text = text.replace("x y z", `x <span id="${id}" data-grammar-command-length="${length + 1}" data-grammar-command-list="coordinate" data-grammar-coordinate-axis="y">y </span><span id="${id}" data-grammar-command-length="${length + 2}" data-grammar-command-list="coordinate" data-grammar-coordinate-axis="z">z</span>`)
                         newEle.setAttribute("data-grammar-coordinate-axis", "x")
+                    } else if (list.replace(/\s/g, "").split(",").includes("commands.tp.rotation.x") === true) {
+                        list = "rotation"
+                        newEle.setAttribute("data-grammar-rotation-axis", "x")
+                    } else if (list.replace(/\s/g, "").split(",").includes("commands.tp.rotation.y") === true) {
+                        list = "rotation"
+                        newEle.setAttribute("data-grammar-rotation-axis", "y")
                     }
+                    newEle.id = id
                     newEle.innerHTML = text
-                    thisGrammarEle.appendChild(newEle)
-                    noteEle.innerHTML += `<span id="${id}" style="display: none;">${eval(`${str}.note`)}</span>`
-                    id++
-                    this.loadFromJson(`${str}.next[0]`, commandName, id)
+                    newEle.setAttribute("data-grammar-command-length", length)
+                    newEle.setAttribute("data-grammar-command-list", list)
+                    grammarEle.appendChild(newEle)
+                    noteEle.innerHTML += `<span id="${id}">${note}</span>`
+                }
+                if (this.now("element") !== undefined) {
+                    this.now("element").style.fontWeight = "bold"
+                    for (var i = 0; i < noteEle.querySelectorAll("span").length; i++) {
+                        noteEle.querySelectorAll("span")[i].style.display = "none"
+                    }
+                    noteEle.querySelector(`[id="${this.now("element").id}"]`).style.display = ""
+                } else {
+                    listEle.setAttribute("data-edit-finished", "true")
                 }
             } else {
-                grammarEle.innerHTML = `<span>/${commandName} </span>`
-                noteEle.innerHTML = `未知的命令（此命令不存在于 page.json.main.${LANG}.grammar 中）`
+                grammarEle.innerHTML = `<span>${commandName} </span>`
+                noteEle.innerHTML = "未知的命令"
+                console.warn(`您需要在 page.json.main.${LANG}.grammar 中添加该命令的语法`)
             }
         },
-        display: function (element) {
-            if (eval(`${element}.querySelectorAll("span").length`) !== 0) {
-                for (var i = 0; i < eval(`${element}.querySelectorAll("span").length`); i++) {
-                    if (eval(`${element}.querySelectorAll("span")[${i}].classList.contains("part")`) === true) break
-                    eval(`${element}.querySelectorAll("span")[${i}].classList.remove("mdui-hidden")`)
-                }
-            }
-            if (eval(`${element}.querySelectorAll("span.part").length`) !== 0) {
-                var e = 0
-                for (var i = 0; i < eval(`${element}.querySelectorAll("span.part").length`); i++) {
-                    for (var x = 0; x < eval(`${element}.querySelectorAll("span.part").length`); x++) {
-                        eval(`${element}.querySelectorAll("span.part")[${x}].classList.add("mdui-hidden")`)
+        getFromJson: function (grammarGroup) {
+                var output = new Array
+                var commandLength = inputEle.value.split(" ").length - 1
+                if (grammarGroup.length > 2) {
+                    for (var i = 2; i < grammarGroup.length; i++) {
+                        var result = new Array
+                        for (var e = 0; e < commandLength && e < grammarGroup[i].display.length; e++) {
+                            var length = grammarGroup[i].display[e].length
+                            var rule = grammarGroup[i].display[e].rule
+                            if (rule.type === "regex") {
+                                if (eval(`${rule.text}.test(page.inputEle.getParameterByLength(length))`) === true) {
+                                    result.push(true)
+                                } else {
+                                    result.push(false)
+                                }
+                            } else if (rule.type === "regex-contrary") {
+                                if (eval(`${rule.text}.test(page.inputEle.getParameterByLength(length))`) === true) {
+                                    result.push(false)
+                                } else {
+                                    result.push(true)
+                                }
+                            } else if (rule.type === "isSelector") {
+                                if (page.inputEle.getParameterByLength(length) !== undefined) {
+                                    if (page.inputEle.getParameterByLength(length).isSelector() === true) {
+                                        result.push(true)
+                                    } else {
+                                        result.push(false)
+                                    }
+                                }
+                            } else if (rule.type === "isCoordinate") {
+                                if (page.inputEle.getParameterByLength(length) !== undefined) {
+                                    if (page.inputEle.getParameterByLength(length).isCoordinate() === true) {
+                                        result.push(true)
+                                    } else {
+                                        result.push(false)
+                                    }
+                                }
+                            }
+                        }
+                        if (result.includes(false) === false) {
+                            output.push(i)
+                        }
                     }
-                    if (eval(`${eval(`${element}.querySelectorAll("span.part")[${i}].getAttribute("data-grammar-judge")`)}.test("${page.inputEle.getParameterByLength(eval(`${element}.querySelectorAll("span.part")[${i}].getAttribute("data-grammar-command-length")`))}")`) === true && e < 1) {
-                        eval(`${element}.querySelectorAll("span.part")[${i}].classList.remove("mdui-hidden")`)
-                        e++
-                        break
+                    if (output[0] !== undefined) {
+                        console.log({output})
+                        return grammarGroup[output[0]]
+                    } else {
+                        return grammarGroup[1]
                     }
+                } else {
+                    return grammarGroup[1]
                 }
-                if (e === 0) {
-                    eval(`${element}.querySelectorAll("span.part")[0].classList.remove("mdui-hidden")`)
-                }
-                this.display(`${element}.querySelector("span.part:not(.mdui-hidden)")`)
-            }
-        },
-        strong: function () {
-            var commandLength = inputEle.value.split(" ").length
-            if (grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1] !== undefined) {
-                grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1].style.fontWeight = "bold"
-                for (var i = 0; i < noteEle.querySelectorAll("span").length; i++) {
-                    noteEle.querySelectorAll("span")[i].style.display = "none"
-                }
-                noteEle.querySelector(`[id="${grammarEle.querySelectorAll("span:not(.mdui-hidden)")[commandLength - 1].id}"]`).style.display = ""
-            } else {
-                listEle.setAttribute("data-edit-finished", "true")
-            }
         }
     },
     custom: {
         setURL: function (isWithoutReload) {
-            var allURL = document.querySelector("#customURL").value.split("\n")
-            if (allURL.length >= 1) {
-                var comment = document.createComment("Custom JavaScript")
-                document.body.appendChild(comment)
-                var realURL = new Array
-                for (var i = 0; i < allURL.length; i++) {
-                    if (allURL[i] !== "" && allURL[i].endsWith(".js")) {
-                        var script = document.createElement("script")
-                        script.src = allURL[i]
-                        document.body.appendChild(script)
-                        realURL.push(allURL[i])
-                    } else if (allURL[i] !== "" && allURL[i].endsWith("/custom.json")) {
-                        var request = new XMLHttpRequest()
-                        request.open("get", allURL[i])
-                        request.send(null)
-                        request.onload = function () {
-                            if (request.status == 200) {
-                                page.json.custom = JSON.parse(request.responseText)
-                            }
-                        }
-                        realURL.push(allURL[i])
+            var URL = document.querySelector("#customURL").value
+            if (URL.endsWith("/custom.json") === true) {
+                var request = new XMLHttpRequest()
+                request.open("get", URL)
+                request.send(null)
+                request.onload = function () {
+                    if (request.status == 200) {
+                        page.json.custom = JSON.parse(request.responseText)
                     }
                 }
+            } else {
+                URL = ""
             }
-            localStorage.setItem("customURL", `${realURL}`)
-            document.querySelector("#customURL").value = localStorage.getItem("customURL").split(",").join("\n")
+            localStorage.setItem("customURL", URL)
             if (isWithoutReload === true) return
             location.reload()
         },
         setURLFromStorage: function () {
-            document.querySelector("#customURL").value = localStorage.getItem("customURL").split(",").join("\n")
+            document.querySelector("#customURL").value = localStorage.getItem("customURL")
             this.setURL(true)
         },
         getURL: function () {
-            return localStorage.getItem("extendURL").split(",")
+            return localStorage.getItem("extendURL")
         }
     },
     setting: {
