@@ -1,21 +1,5 @@
 export var json = {
-    "execute": {
-        "detect": [
-            {
-                "template": {}
-            },
-            {
-                "name": "detect",
-                "info": "[不是命令] 检测方块。",
-                "input": {
-                    "text": "{name} "
-                }
-            }
-        ]
-    },
-    "tp": {
-        "rotation": {
-            "x": [
+            "y": [
                 {
                     "template": {
                         "input": {
@@ -52,7 +36,7 @@ export var json = {
                     "info": "竖直向下"
                 },
             ],
-            "y": [
+            "x": [
                 {
                     "template": {
                         "input": {
@@ -97,21 +81,4 @@ export var json = {
                     "info": "正西"
                 }
             ]
-        },
-        "facing": [
-            {
-                "template": {}
-            },
-            {
-                "name": "facing",
-                "info": "指定朝向",
-                "input": {
-                    "text": "{name} "
-                }
-            }
-        ]
-    },
-    "help": {
-        "pageNumber": []
-    }
 }

@@ -8,15 +8,16 @@ export var json = {
             },
             "value": [
                 {
-                    "template": {}
+                    "extend": "next",
+                    "template": {
+                        "input": {
+                            "replace": "none",
+                            "text": "{name} "
+                        }
+                    }
                 },
                 {
-                    "name": "",
-                    "info": "下一项",
-                    "input": {
-                        "replace": "none",
-                            "text": " "
-                    }
+                    "name": "demo"
                 }
             ]
         },
@@ -38,15 +39,8 @@ export var json = {
             },
             "value": [
                 {
+                    "extend": "next",
                     "template": {}
-                },
-                {
-                    "name": "",
-                    "info": "下一项",
-                    "input": {
-                        "replace": "none",
-                            "text": " "
-                    }
                 }
             ]
         },
@@ -68,15 +62,8 @@ export var json = {
             },
             "value": [
                 {
+                    "extend": "next",
                     "template": {}
-                },
-                {
-                    "name": "",
-                    "info": "下一项",
-                    "input": {
-                        "replace": "none",
-                            "text": " "
-                    }
                 }
             ]
         },

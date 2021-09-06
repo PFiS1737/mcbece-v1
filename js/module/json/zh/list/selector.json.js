@@ -40,9 +40,10 @@ export var json = {
                 "text": "{name} "
             }
         }
-            ],
+    ],
     "parameter": [
         {
+            "extend": "player",
             "template": {
                 "url": "{command_page}",
                 "input": {
@@ -72,11 +73,11 @@ export var json = {
         },
         {
             "name": "@c",
-            "info": "[仅教育版] 选择自己的吉祥物。‌‌"
+            "info": "[仅教育版] 选择自己的智能体。‌‌"
         },
         {
             "name": "@v",
-            "info": "[仅教育版] 选择所有的吉祥物。‌‌"
+            "info": "[仅教育版] 选择所有的智能体。‌‌"
         }
     ],
     "variable": [
@@ -92,17 +93,29 @@ export var json = {
         {
             "name": "x",
             "info": "指定X轴基准点。",
-            "value": []
+            "value": [
+                {
+                    "extend": "coordinate.x{input: {replace: 'none'}}"
+                }
+            ]
         },
         {
             "name": "y",
             "info": "指定Y轴基准点。",
-            "value": []
+            "value": [
+                {
+                    "extend": "coordinate.y{input: {text: '{name}'}}"
+                }
+            ]
         },
         {
             "name": "z",
             "info": "指定Z轴基准点。",
-            "value": []
+            "value": [
+                {
+                    "extend": "coordinate.z{input: {text: '{name}'}}"
+                }
+            ]
         },
         {
             "name": "r",
@@ -187,12 +200,20 @@ export var json = {
         {
             "name": "type",
             "info": "通过实体类型选择目标。",
-            "value": []
+            "value": [
+                {
+                    "extend": "entity"
+                }
+            ]
         },
         {
-            "name": "family‌‌",
+            "name": "family",
             "info": "通过家族选择目标。",
-            "value": []
+            "value": [
+                {
+                    "extend": "entity.family"
+                }
+            ]
         }
     ]
 }

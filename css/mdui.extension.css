@@ -42,7 +42,7 @@
 
 
 .mdui-list-item-display-when-hover {
-    display: none;
+    display: none !important;
 }
 
 .mdui-list-item:hover .mdui-list-item-display-when-hover {

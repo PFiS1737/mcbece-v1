@@ -1,4 +1,7 @@
-export var json = [
+// 这个列表的标准译名应该是 "structure"
+// 不过为了和 /structure 命令的参数区分，就写成了 "location"
+
+export let json = [
     {
         "template": {
             "url": "{normal_page}{info}",

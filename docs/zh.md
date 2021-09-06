@@ -132,7 +132,6 @@
 
 - `name`
     - 列表项的名称
-    - **必填，否则会报错**
     - 但可以为`""`
 - `info`
     - 列表项的信息
@@ -141,16 +140,16 @@
     - 列表项对应的链接
     - 可以用`{name}`调用此列表项的`name`
     - 可以用`{info}`调用此列表项的`info`
-    - 可以用`{command_page}`调用`page.json.main.${LANG}.text.url.command_page`的内容
-    - 可以用`{normal_page}`调用`page.json.main.${LANG}.text.url.normal_page`的内容
-    - 可以用`{search_page}`调用`page.json.main.${LANG}.text.url.search_page`的内容
+    - 可以用`{command_page}`调用`page.json.${LANG}.text.url.command_page`的内容
+    - 可以用`{normal_page}`调用`page.json.${LANG}.text.url.normal_page`的内容
+    - 可以用`{search_page}`调用`page.json.${LANG}.text.url.search_page`的内容
     - 它可以写在`template`中
 - `input`
     - 点击列表项后输入到输入栏的内容及规则
     - `input.replace`规定了它的替换规则
         - 为`"all"`将会替换整个输入栏的内容
         - 为`"none"`将不替换任何内容
-        - 不填或填其他内容将会替换输入栏中最新的一个命令参数（`page.inputEle.getParameterByLength("the_latest_command_parameter")`）
+        - 不填或填其他内容将会替换输入栏中最新的一个命令参数（`page.getParameterByLength("the_latest_command_parameter")`）
     - `input.text`规定了最终会添加进输入栏的内容
         - 可以用`{name}`调用此列表项的`name`
         - 可以用`{info}`调用此列表项的`info`
@@ -160,52 +159,48 @@
     - 使用后点击列表将不再触发`page.chang()`而是以`page.listEle.load('...')`代替
     - 它的内容应该为一个或多个列表名称，例如上文中的`block`和`coordinate.x`
     - 它可以写在`template`中
-- 一个可以正常加载的空列表应该为
-    - 不包含任何项
-    - 可以包含配置项
-    - 如果包含列表项，则**必须**有配置项，且配置项中必须有`template`，否则会报错
-    - 即：
+- 一个可以正常加载的简单的列表应该和下面的例子类似
+    - 如果一个列表有多于1项，那么它的第一项应为配置项，且**必须**有"template"，即使"template"为空
+    - 如果一个列表有不多于1项（1项或0项），那么它将被编译为"[]"
     ```javascript
-    // good
+    // good: can load a list with nothing
     "list_name": []
     
-    // good
+    // good: can load a list with nothing
     "list_name": [
-    	{
-    		"template": {...}
-    	}
+        {
+            "template": {
+                ...
+            }
+        }
     ]
     
-    // good
+    // good: can load a list with nothing
     "list_name": [
-	    {}
+        {}
     ]
     
-    // good
+    // good: can load a list with one or more item
     "list_name": [
-    	{
-    		"template": {...}
-    	},
-    	{
-    		"name": "",
-    		...
-    	}
+        {
+            "template": {
+                ...
+            }
+        },
+        {
+            ...
+        }
+        ...
     ]
     
-    // error
+    // error: the first item of a list must be with "template"
     "list_name": [
-    	{
-    		"name": "",
-    		...
-    	}
-    ]
-    
-    // error
-    "list_name": [
-    	{},
-    	{
-    		"name": "",
-    		...
-    	}
+        {
+            ...
+        },
+        {
+            "name": "",
+            ...
+        }
     ]
     ```

@@ -1,46 +1,48 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width">
-        <title>基岩版命令编写助手</title>
-        <meta name="theme-color" content="#3F51B5">
-        <link rel="shortcut icon" type="image/png" href="./icon.png">
-        <!--Manifest-->
-        <link rel="manifest" href="./manifest.json"/>
-        <!--CSS-->
-        <link rel="stylesheet" href="./css/index.css"/>
-        <!--MDUI CSS-->
-        <link rel="stylesheet" href="./dependencies/mdui/css/mdui.min.css"/>
-        <link rel="stylesheet" href="./css/mdui.extension.css"/>
-        <!--Eruda.js-->
-        <script>
-            /**
-             * 移动端开发者工具（eruda）：默认关闭
-             * Mobile Devtools(eruda): default off
-             * 
-             * https://github.com/liriliri/eruda
-             */
-            if (localStorage.getItem("devTool") === null) {
-                localStorage.setItem("devTool", "false")
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>基岩版命令编写助手</title>
+    <meta name="theme-color" content="#3F51B5">
+    <link rel="shortcut icon" type="image/png" href="./icon.png">
+    <!--Manifest-->
+    <link rel="manifest" href="./manifest.json"/>
+    <!--CSS-->
+    <link rel="stylesheet" href="./css/index.css"/>
+    <!--MDUI CSS-->
+    <link rel="stylesheet" href="./dependencies/mdui/css/mdui.min.css"/>
+    <!--Eruda.js-->
+    <script>
+        /**
+         * 移动端开发者工具（eruda）：默认关闭
+         * Mobile Devtools(eruda): default off
+         * 
+         * https://github.com/liriliri/eruda
+         */
+        if (localStorage.getItem("devTool") === null) {
+            localStorage.setItem("devTool", "false")
+        }
+        if (localStorage.getItem("devTool") === "true") {
+            let script = document.createElement("script")
+            script.src = "./dependencies/eruda/eruda.min.js"
+            document.head.appendChild(script)
+            script.onload = () => {
+                eruda.init()
             }
-            if (localStorage.getItem("devTool") === "true") {
-                var script = document.createElement("script")
-                script.src = "./dependencies/eruda/eruda.min.js"
-                document.head.appendChild(script)
-                script.onload = function () {
-                    eruda.init()
-                }
-            }
-        </script>
-    </head>
-    <body class="thin-model mdui-theme-primary-indigo mdui-theme-accent-pink" style="padding-top: 120px;">
+        }
+        localStorage.setItem("devTool", "true")
+    </script>
+</head>
+
+<body class="mdui-theme-primary-indigo mdui-theme-accent-pink" style="padding-top: 128px;">
         <!--应用栏-->
         <div class="mdui-appbar mdui-appbar-fixed">
             <div class="mdui-toolbar mdui-color-theme" style="height: 60px;">
                 <i style="width: 32px !important;" class="mdui-icon material-icons mdui-text-color-white-icon mdui-m-r-0">edit</i>
                 <div class="mdui-textfield mdui-textfield-white" style="padding: 18px 0; width: 100%">
-                    <input style="height: 24px; width: 100%; padding-bottom: 4px" class="mdui-textfield-input mdui-text-color-white-text mdui-p-t-0" type="text" id="edit"/>
+                    <input style="height: 24px; width: 100%; padding-bottom: 4px" class="mdui-textfield-input mdui-text-color-white-text mdui-p-t-0 minecraft-font" type="text" id="edit"/>
                 </div>
             </div>
             <div class="mdui-toolbar mdui-color-white" style="height: 60px;">
@@ -48,10 +50,10 @@
                     <div class="mdui-list-item-title" id="grammar" style="overflow-x: scroll;"></div>
                     <div class="mdui-list-item-text mdui-list-item-one-line" id="note" style="overflow-x: scroll;"></div>
                 </div>
-                <a class="mdui-btn mdui-btn-icon" target="_blank" id="wiki" mdui-tooltip="{content: 'WIKI'}">
+                <a class="mdui-btn mdui-btn-icon" style="min-width: 24px; width: 24px; margin-left: 0; margin-right: 12px" target="_blank" id="wiki" mdui-tooltip="{content: 'WIKI'}">
                     <i class="mdui-icon material-icons mdui-text-color-theme-icon">send</i>
                 </a>
-                <button class="mdui-btn mdui-btn-icon" style="display: none;" id="copy" mdui-tooltip="{content: 'COPY'}" onclick="page.inputEle.copy('copy')">
+                <button class="mdui-btn mdui-btn-icon" style="display: none; min-width: 24px; width: 24px; margin-left: 0; margin-right: 12px" id="copy" mdui-tooltip="{content: 'COPY'}" onclick="page.input.copy('copy')">
                     <i class="mdui-icon material-icons mdui-text-color-theme-icon">content_copy</i>
                 </button>
             </div>
@@ -140,13 +142,13 @@
                     <div class="mdui-col-xs-1 mdui-p-b-1" style="width: 30px;"></div>
                     <div class="mdui-col-xs-11 mdui-p-b-1">
                         <div class="mdui-textfield mdui-textfield-black mdui-p-a-0">
-                            <textarea class="mdui-textfield-input" placeholder="请输入文件链接（每行一个）" id="customURL"></textarea>
+                            <input class="mdui-textfield-input" placeholder="请输入文件链接" id="customURL" />
                         </div>
                     </div>
                 </div>
             </div>
             <div class="mdui-dialog-actions">
-                <button class="mdui-btn mdui-ripple" onclick="page.custom.setCustomURL()">保存</button>
+                <button class="mdui-btn mdui-ripple" onclick="page.custom.setURL()">保存</button>
                 <button class="mdui-btn mdui-ripple" mdui-dialog-close>关闭</button>
             </div>
         </div>
@@ -239,7 +241,7 @@
         </div>
         <!--列表-->
         <div class="mdui-container-fluid mdui-p-a-0">
-            <ul class="mdui-list mdui-p-t-0" id="list"></ul>
+            <div class="mdui-list mdui-p-t-0" id="list"></div>
         </div>
         <!--MDUI JS-->
         <script src="./dependencies/mdui/js/mdui.min.js"></script>
@@ -270,8 +272,24 @@
             if (localStorage.getItem("customURL") === null) {
                 localStorage.setItem("customURL", "")
             }
+            /** 
+             * 默认列表是否加载图片："true"
+             * Default The List Item Is With Image: "true"
+             */
+            if (localStorage.getItem("withImage") === null) {
+                localStorage.setItem("withImage", "true")
+            }
         </script>
         <script src="./js/index.js"></script>
         <script type="module" src="./js/module.js"></script>
-    </body>
+        <script>
+            const LANG = page.setting.language.get()
+            page.list.withImage = page.setting.withImage.get()
+            page.setting.mduiThemeColor.setFromStorage()
+            window.onload = () => {
+                page.initialization()
+            }
+        </script>
+</body>
+
 </html>

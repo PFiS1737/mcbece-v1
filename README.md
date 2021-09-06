@@ -6,17 +6,25 @@
 > 重要通知：
 > > 咕咕咕
 
-- 主要html：90%
+- 主要html：
     - 编写 div#setting 对应的设置列表
     - 其他优化
-- 主要json：5%
-    - block
-    - item
+- 主要json：
+    - block          // 已生成
+    - block.data     // 已生成
+    - block.state
+    - item           // 已生成
+    - item.data      // 已生成
+    - entity         // 已生成
+    - entity.event
+    - entiry.family
     - 
     - ...
-- 优化：30%
+- 优化：
     - 桌面端tab键支持
+    - 移动端布局优化
     - 多语言优化
     - 自定义优化
     - 穷举助手
+    - 视情况自动加载"next"列表
     - ...
